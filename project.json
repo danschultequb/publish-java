@@ -1,0 +1,38 @@
+{
+  "publisher": "qub",
+  "project": "qub-java-publish",
+  "version": "1",
+  "java": {
+    "mainClass": "qub.QubPublish",
+    "shortcutName": "qub-publish",
+    "version": "1.8",
+    "sources": {
+      "version": "1.8"
+    },
+    "tests": {
+      "version": "1.8"
+    },
+    "dependencies": [
+      {
+        "publisher": "qub",
+        "project": "qub-java",
+        "version": "72"
+      },
+      {
+        "publisher": "qub",
+        "project": "qub-build",
+        "version": "72"
+      },
+      {
+        "publisher": "qub",
+        "project": "qub-test",
+        "version": "36"
+      },
+      {
+        "publisher": "qub",
+        "project": "qub-java-pack",
+        "version": "1"
+      }
+    ]
+  }
+}
