@@ -2,33 +2,32 @@ package qub;
 
 public class QubPublish
 {
-    private QubTest qubTest;
-    private JarCreator jarCreator;
+    private QubPack qubPack;
     private Boolean showTotalDuration;
 
     /**
-     * Set the QubTest object that will be used to test the source code.
-     * @param qubTest The QubTest object that will be used to test the source code.
+     * Set the QubPack object that will be used to package the source code.
+     * @param qubPack The QubPack object that will be used to package the source code.
      * @return This object for method chaining.
      */
-    public QubPublish setQubTest(QubTest qubTest)
+    public QubPublish setQubPack(QubPack qubPack)
     {
-        this.qubTest = qubTest;
+        this.qubPack = qubPack;
         return this;
     }
 
     /**
-     * Get the QubTest object that will be used to test the source code. If no QubTest object has
+     * Get the QubPack object that will be used to package the source code. If no QubPack object has
      * been set, a default one will be created and returned.
-     * @return The QubTest object that will be used to test the source code.
+     * @return The QubPack object that will be used to test the source code.
      */
-    public QubTest getQubTest()
+    public QubPack getQubPack()
     {
-        if (qubTest == null)
+        if (qubPack == null)
         {
-            qubTest = new QubTest();
+            qubPack = new QubPack();
         }
-        final QubTest result = qubTest;
+        final QubPack result = qubPack;
 
         PostCondition.assertNotNull(result, "result");
 
@@ -36,39 +35,21 @@ public class QubPublish
     }
 
     /**
-     * Set the JarCreator that will be used to create jar files.
-     * @param jarCreator The JarCreator that will be used to create jar files.
+     * Set whether or not the total duration to publish will be written to the console.
+     * @param showTotalDuration Whether or not the total duration to publish will be written to the
+     *                          console.
      * @return This object for method chaining.
      */
-    public QubPublish setJarCreator(JarCreator jarCreator)
-    {
-        this.jarCreator = jarCreator;
-        return this;
-    }
-
-    /**
-     * Get the JarCreator that will be used to create jar files. If no JarCreator has been set, a
-     * default one will be created and returned.
-     * @return The JarCreator that will be used to create jar files.
-     */
-    public JarCreator getJarCreator()
-    {
-        if (jarCreator == null)
-        {
-            jarCreator = new JavaJarCreator();
-        }
-        final JarCreator result = jarCreator;
-
-        PostCondition.assertNotNull(result, "result");
-
-        return result;
-    }
-
-    public void setShowTotalDuration(boolean showTotalDuration)
+    public QubPublish setShowTotalDuration(boolean showTotalDuration)
     {
         this.showTotalDuration = showTotalDuration;
+        return this;
     }
 
+    /**
+     * Get whether or not the total duration to publish will be written to the console.
+     * @return Whether or not the total duration to publish will be written to the console.
+     */
     public boolean getShowTotalDuration()
     {
         if (showTotalDuration == null)
@@ -84,9 +65,9 @@ public class QubPublish
 
         if (shouldShowUsage(console))
         {
-            console.writeLine("Usage: qub-pack [[-folder=]<folder-path-to-pack>] [-verbose]").await();
-            console.writeLine("  Used to package source and compiled code in source code projects.").await();
-            console.writeLine("  -folder: The folder to pack. This can be specified either with the -folder").await();
+            console.writeLine("Usage: qub-publish [[-folder=]<folder-path-to-publish>] [-verbose]").await();
+            console.writeLine("  Used to publish packaged source and compiled code to the qub folder.").await();
+            console.writeLine("  -folder: The folder to publish. This can be specified either with the -folder").await();
             console.writeLine("           argument name or without it.").await();
             console.writeLine("  -verbose: Whether or not to show verbose logs.").await();
             console.setExitCode(-1);
@@ -107,63 +88,47 @@ public class QubPublish
             }
             try
             {
-                final QubTest qubTest = getQubTest();
-                qubTest.setShowTotalDuration(false);
-                qubTest.main(console);
+                final QubPack qubPack = getQubPack();
+                qubPack.setShowTotalDuration(false);
+                qubPack.main(console);
 
                 if (console.getExitCode() == 0)
                 {
-                    final JarCreator jarCreator = getJarCreator();
-
-                    final Folder folderToPack = getFolderToPack(console);
-                    final Folder outputFolder = folderToPack.getFolder("outputs").await();
-                    final Iterable<File> outputClassFiles = outputFolder.getFilesRecursively().await()
-                        .where((File file) -> Comparer.equal(file.getFileExtension(), ".class"))
-                        .toList();
-
-                    final Folder sourceFolder = folderToPack.getFolder("sources").await();
-                    final Iterable<File> sourceJavaFiles = sourceFolder.getFilesRecursively().await()
-                        .where((File file) -> Comparer.equal(file.getFileExtension(), ".java"))
-                        .toList();
-
-                    final File projectJsonFile = folderToPack.getFile("project.json").await();
-                    final ProjectJSON projectJson = ProjectJSON.parse(projectJsonFile).await();
-
-                    console.writeLine("Creating sources jar file...").await();
-                    jarCreator.setBaseFolder(sourceFolder);
-                    jarCreator.setJarName(projectJson.getProject() + ".sources");
-                    jarCreator.setFiles(sourceJavaFiles);
-                    final File sourcesJarFile = jarCreator.createJarFile(console, isVerbose(console)).await();
-                    final File sourcesJarFileInOutputsFolder = outputFolder.getFile(sourcesJarFile.getName()).await();
-                    sourcesJarFile.copyTo(sourcesJarFileInOutputsFolder).await();
-                    sourcesJarFile.delete().await();
-                    verbose(console, "Created " + sourcesJarFileInOutputsFolder + ".").await();
-
-                    console.writeLine("Creating compiled sources jar file...").await();
-                    jarCreator.setBaseFolder(outputFolder);
-                    jarCreator.setJarName(projectJson.getProject());
-                    final String mainClass = projectJson.getJava().getMainClass();
-                    if (!Strings.isNullOrEmpty(mainClass))
+                    final String qubHome = console.getEnvironmentVariable("QUB_HOME");
+                    if (Strings.isNullOrEmpty(qubHome))
                     {
-                        final File manifestFile = outputFolder.getFile("META-INF/MANIFEST.MF").await();
-                        final String manifestFileContents =
-                            "Manifest-Version: 1.0\n" +
-                            "Main-Class: " + mainClass + "\n";
-                        manifestFile.setContentsAsString(manifestFileContents).await();
-                        jarCreator.setManifestFile(manifestFile);
+                        error(console, "Cannot publish without a QUB_HOME environment variable.").await();
                     }
-                    jarCreator.setFiles(outputClassFiles
-                        .where((File outputClassFile) ->
+                    else
+                    {
+                        final Folder folderToPublish = getFolderToPublish(console);
+                        final Folder outputFolder = folderToPublish.getFolder("outputs").await();
+
+                        final File projectJsonFile = folderToPublish.getFile("project.json").await();
+                        final ProjectJSON projectJSON = ProjectJSON.parse(projectJsonFile).await();
+                        final String publisher = projectJSON.getPublisher();
+                        final String project = projectJSON.getProject();
+                        final String version = projectJSON.getVersion();
+
+                        final Folder qubFolder = console.getFileSystem().getFolder(qubHome).await();
+                        final Folder publisherFolder = qubFolder.getFolder(publisher).await();
+                        final Folder projectFolder = publisherFolder.getFolder(project).await();
+                        final Folder versionFolder = projectFolder.getFolder(version).await();
+                        if (versionFolder.exists().await())
                         {
-                            final Path outputClassFileRelativePath = outputClassFile.relativeTo(outputFolder).withoutFileExtension();
-                            return sourceJavaFiles.contains((File sourceJavaFile) ->
-                            {
-                                final Path sourceJavaFileRelativePath = sourceJavaFile.relativeTo(sourceFolder).withoutFileExtension();
-                                return outputClassFileRelativePath.equals(sourceJavaFileRelativePath);
-                            });
-                        }));
-                    final File compiledSourcesJarFile = jarCreator.createJarFile(console, isVerbose(console)).await();
-                    verbose(console, "Created " + compiledSourcesJarFile + ".").await();
+                            error(console, "This package (" + publisher + "/" + project + ":" + version + ") can't be published because a package with that signature already exists.").await();
+                        }
+                        else
+                        {
+                            final File compiledSourcesJarFile = outputFolder.getFile(project + ".jar").await();
+                            final File sourcesJarFile = outputFolder.getFile(project + ".sources.jar").await();
+
+                            console.writeLine("Publishing...").await();
+                            projectJsonFile.copyToFolder(versionFolder).await();
+                            compiledSourcesJarFile.copyToFolder(versionFolder).await();
+                            sourcesJarFile.copyToFolder(versionFolder).await();
+                        }
+                    }
                 }
             }
             finally
@@ -189,7 +154,7 @@ public class QubPublish
             });
     }
 
-    private static Path getFolderPathToPack(Console console)
+    private static Path getFolderPathToPublish(Console console)
     {
         PreCondition.assertNotNull(console, "console");
 
@@ -225,13 +190,13 @@ public class QubPublish
         return result;
     }
 
-    private static Folder getFolderToPack(Console console)
+    private static Folder getFolderToPublish(Console console)
     {
         PreCondition.assertNotNull(console, "console");
 
-        final Path folderPathToPack = getFolderPathToPack(console);
+        final Path folderPathToPublish = getFolderPathToPublish(console);
         final FileSystem fileSystem = console.getFileSystem();
-        final Folder result = fileSystem.getFolder(folderPathToPack).await();
+        final Folder result = fileSystem.getFolder(folderPathToPublish).await();
 
         PostCondition.assertNotNull(result, "result");
 

@@ -6,44 +6,50 @@ public interface QubPublishTests
     {
         runner.testGroup(QubPublish.class, () ->
         {
-            runner.testGroup("setQubTest(QubTest)", () ->
+            runner.testGroup("setQubPack(QubPack)", () ->
             {
                 runner.test("with null", (Test test) ->
                 {
-                    final QubPublish qubPack = new QubPublish();
-                    test.assertSame(qubPack, qubPack.setQubTest(null));
-                    final QubTest qubTest = qubPack.getQubTest();
-                    test.assertNotNull(qubTest);
-                    test.assertSame(qubTest, qubPack.getQubTest());
+                    final QubPublish qubPublish = new QubPublish();
+                    test.assertSame(qubPublish, qubPublish.setQubPack(null));
+                    final QubPack qubPack = qubPublish.getQubPack();
+                    test.assertNotNull(qubPack);
+                    test.assertSame(qubPack, qubPublish.getQubPack());
                 });
 
                 runner.test("with non-null", (Test test) ->
                 {
-                    final QubPublish qubPack = new QubPublish();
-                    final QubTest qubTest = qubPack.getQubTest();
-                    test.assertSame(qubPack, qubPack.setQubTest(qubTest));
-                    test.assertSame(qubTest, qubPack.getQubTest());
+                    final QubPublish qubPublish = new QubPublish();
+                    final QubPack qubPack = qubPublish.getQubPack();
+                    test.assertSame(qubPublish, qubPublish.setQubPack(qubPack));
+                    test.assertSame(qubPack, qubPublish.getQubPack());
                 });
             });
 
-            runner.testGroup("setJarCreator(JarCreator)", () ->
+            runner.testGroup("setShowTotalDuration(boolean)", () ->
             {
-                runner.test("with null", (Test test) ->
+                runner.test("with false", (Test test) ->
                 {
-                    final QubPublish qubPack = new QubPublish();
-                    test.assertSame(qubPack, qubPack.setJarCreator(null));
-                    final JarCreator jarCreator = qubPack.getJarCreator();
-                    test.assertNotNull(jarCreator);
-                    test.assertTrue(jarCreator instanceof JavaJarCreator);
-                    test.assertSame(jarCreator, qubPack.getJarCreator());
+                    final QubPublish qubPublish = new QubPublish();
+                    test.assertSame(qubPublish, qubPublish.setShowTotalDuration(false));
+                    test.assertFalse(qubPublish.getShowTotalDuration());
                 });
 
-                runner.test("with non-null", (Test test) ->
+                runner.test("with true", (Test test) ->
                 {
-                    final QubPublish qubPack = new QubPublish();
-                    final JarCreator jarCreator = new FakeJarCreator();
-                    test.assertSame(qubPack, qubPack.setJarCreator(jarCreator));
-                    test.assertSame(jarCreator, qubPack.getJarCreator());
+                    final QubPublish qubPublish = new QubPublish();
+                    test.assertSame(qubPublish, qubPublish.setShowTotalDuration(true));
+                    test.assertTrue(qubPublish.getShowTotalDuration());
+                });
+            });
+
+            runner.testGroup("getShowTotalDuration()", () ->
+            {
+                runner.test("when no value has been set", (Test test) ->
+                {
+                    final QubPublish qubPublish = new QubPublish();
+                    test.assertTrue(qubPublish.getShowTotalDuration());
+                    test.assertTrue(qubPublish.getShowTotalDuration());
                 });
             });
 
@@ -78,9 +84,9 @@ public interface QubPublishTests
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Usage: qub-pack [[-folder=]<folder-path-to-pack>] [-verbose]",
-                            "  Used to package source and compiled code in source code projects.",
-                            "  -folder: The folder to pack. This can be specified either with the -folder",
+                            "Usage: qub-publish [[-folder=]<folder-path-to-publish>] [-verbose]",
+                            "  Used to publish packaged source and compiled code to the qub folder.",
+                            "  -folder: The folder to publish. This can be specified either with the -folder",
                             "           argument name or without it.",
                             "  -verbose: Whether or not to show verbose logs."
                         ),
@@ -102,9 +108,9 @@ public interface QubPublishTests
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Usage: qub-pack [[-folder=]<folder-path-to-pack>] [-verbose]",
-                            "  Used to package source and compiled code in source code projects.",
-                            "  -folder: The folder to pack. This can be specified either with the -folder",
+                            "Usage: qub-publish [[-folder=]<folder-path-to-publish>] [-verbose]",
+                            "  Used to publish packaged source and compiled code to the qub folder.",
+                            "  -folder: The folder to publish. This can be specified either with the -folder",
                             "           argument name or without it.",
                             "  -verbose: Whether or not to show verbose logs."
                         ),
@@ -112,14 +118,160 @@ public interface QubPublishTests
                     test.assertEqual("", error.asCharacterReadStream().getText().await());
                 });
 
-                runner.test("with exit code 0 after tests", runner.skip(), (Test test) ->
+                runner.test("with no QUB_HOME specified", (Test test) ->
                 {
                     final InMemoryByteStream output = new InMemoryByteStream();
                     final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
+                    fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
+                    final ProjectJSON projectJSON = new ProjectJSON();
+                    projectJSON.setProject("my-project");
+                    projectJSON.setPublisher("me");
+                    projectJSON.setVersion("1");
+                    projectJSON.setJava(new ProjectJSONJava());
+                    fileSystem.setFileContentAsString(
+                        "/project.json",
+                        JSON.object(projectJSON::write).toString()).await();
                     try (final Console console = new Console())
                     {
                         console.setOutputByteWriteStream(output);
                         console.setErrorByteWriteStream(error);
+                        console.setFileSystem(fileSystem);
+                        console.setCurrentFolderPath(Path.parse("/"));
+                        console.setEnvironmentVariables(Map.create());
+
+                        main(console);
+                        test.assertEqual(1, console.getExitCode());
+                    }
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Running tests...",
+                            "",
+                            "Creating sources jar file...",
+                            "Creating compiled sources jar file...",
+                            "ERROR: Cannot publish without a QUB_HOME environment variable."
+                        ),
+                        Strings.getLines(output.asCharacterReadStream().getText().await()));
+                    test.assertEqual("", error.asCharacterReadStream().getText().await());
+                });
+
+                runner.test("with failed QubPack", (Test test) ->
+                {
+                    final InMemoryByteStream output = new InMemoryByteStream();
+                    final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
+                    fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
+                    final ProjectJSON projectJSON = new ProjectJSON();
+                    projectJSON.setProject("my-project");
+                    projectJSON.setPublisher("me");
+                    projectJSON.setVersion("1");
+                    projectJSON.setJava(new ProjectJSONJava());
+                    fileSystem.setFileContentAsString(
+                        "/project.json",
+                        JSON.object(projectJSON::write).toString()).await();
+                    try (final Console console = new Console())
+                    {
+                        console.setOutputByteWriteStream(output);
+                        console.setErrorByteWriteStream(error);
+                        console.setFileSystem(fileSystem);
+                        console.setCurrentFolderPath(Path.parse("/"));
+                        console.setEnvironmentVariables(Map.<String,String>create()
+                            .set("QUB_HOME", "/qub/"));
+
+                        final QubBuild qubBuild = new QubBuild();
+                        qubBuild.setJavaCompiler(new FakeJavaCompiler());
+
+                        final QubTest qubTest = new QubTest();
+                        final FakeJavaRunner javaRunner = new FakeJavaRunner();
+                        javaRunner.setExitCode(1);
+                        qubTest.setJavaRunner(javaRunner);
+                        qubTest.setQubBuild(qubBuild);
+
+                        final QubPack qubPack = new QubPack();
+                        qubPack.setQubTest(qubTest);
+                        qubPack.setJarCreator(new FakeJarCreator());
+
+                        main(console, qubPack);
+                        test.assertEqual(1, console.getExitCode());
+                    }
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Running tests...",
+                            ""
+                        ),
+                        Strings.getLines(output.asCharacterReadStream().getText().await()));
+                    test.assertEqual("", error.asCharacterReadStream().getText().await());
+                });
+
+                runner.test("with already existing version folder", (Test test) ->
+                {
+                    final InMemoryByteStream output = new InMemoryByteStream();
+                    final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
+                    fileSystem.createFolder("/qub/me/my-project/1/").await();
+                    fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
+                    final ProjectJSON projectJSON = new ProjectJSON();
+                    projectJSON.setProject("my-project");
+                    projectJSON.setPublisher("me");
+                    projectJSON.setVersion("1");
+                    projectJSON.setJava(new ProjectJSONJava());
+                    fileSystem.setFileContentAsString(
+                        "/project.json",
+                        JSON.object(projectJSON::write).toString()).await();
+                    try (final Console console = new Console())
+                    {
+                        console.setOutputByteWriteStream(output);
+                        console.setErrorByteWriteStream(error);
+                        console.setFileSystem(fileSystem);
+                        console.setCurrentFolderPath(Path.parse("/"));
+                        console.setEnvironmentVariables(Map.<String,String>create()
+                            .set("QUB_HOME", "/qub/"));
+
+                        main(console);
+                        test.assertEqual(1, console.getExitCode());
+                    }
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Running tests...",
+                            "",
+                            "Creating sources jar file...",
+                            "Creating compiled sources jar file...",
+                            "ERROR: This package (me/my-project:1) can't be published because a package with that signature already exists."
+                        ),
+                        Strings.getLines(output.asCharacterReadStream().getText().await()));
+                    test.assertEqual("", error.asCharacterReadStream().getText().await());
+                });
+
+                runner.test("with simple success scenario", (Test test) ->
+                {
+                    final InMemoryByteStream output = new InMemoryByteStream();
+                    final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
+                    fileSystem.createFolder("/qub/").await();
+                    fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
+                    final ProjectJSON projectJSON = new ProjectJSON();
+                    projectJSON.setProject("my-project");
+                    projectJSON.setPublisher("me");
+                    projectJSON.setVersion("1");
+                    projectJSON.setJava(new ProjectJSONJava());
+                    fileSystem.setFileContentAsString(
+                        "/project.json",
+                        JSON.object(projectJSON::write).toString()).await();
+                    try (final Console console = new Console())
+                    {
+                        console.setOutputByteWriteStream(output);
+                        console.setErrorByteWriteStream(error);
+                        console.setFileSystem(fileSystem);
+                        console.setCurrentFolderPath(Path.parse("/"));
+                        console.setEnvironmentVariables(Map.<String,String>create()
+                            .set("QUB_HOME", "/qub/"));
 
                         main(console);
                         test.assertEqual(0, console.getExitCode());
@@ -129,44 +281,11 @@ public interface QubPublishTests
                             "Compiling...",
                             "Running tests...",
                             "",
+                            "Creating sources jar file...",
                             "Creating compiled sources jar file...",
-                            "Creating sources jar file..."
+                            "Publishing..."
                         ),
                         Strings.getLines(output.asCharacterReadStream().getText().await()));
-                    test.assertEqual("", error.asCharacterReadStream().getText().await());
-                });
-
-                runner.test("with exit code 0 after tests with -verbose", runner.skip(), (Test test) ->
-                {
-                    final InMemoryByteStream output = new InMemoryByteStream();
-                    final InMemoryByteStream error = new InMemoryByteStream();
-                    try (final Console console = new Console(Iterable.create("-verbose")))
-                    {
-                        console.setOutputByteWriteStream(output);
-                        console.setErrorByteWriteStream(error);
-
-                        main(console);
-                        test.assertEqual(0, console.getExitCode());
-                    }
-
-                    final String outputText = output.asCharacterReadStream().getText().await();
-                    test.assertContains(outputText, "Compiling...");
-                    test.assertContains(outputText, "VERBOSE: Parsing project.json...");
-                    test.assertContains(outputText, "VERBOSE: Parsing outputs/parse.json...");
-                    test.assertContains(outputText, "VERBOSE: Updating outputs/parse.json...");
-                    test.assertContains(outputText, "VERBOSE: Setting project.json...");
-                    test.assertContains(outputText, "VERBOSE: Setting source files...");
-                    test.assertContains(outputText, "VERBOSE: Writing parse.json file...");
-                    test.assertContains(outputText, "VERBOSE: Done writing parse.json file...");
-                    test.assertContains(outputText, "VERBOSE: Detecting java source files to compile...");
-                    test.assertContains(outputText, "VERBOSE: No source files need compilation.");
-                    test.assertContains(outputText, "Running tests...");
-                    test.assertContains(outputText, "VERBOSE: java.exe -classpath C:/Users/dansc/Sources/qub-java-pack/outputs;C:/qub/qub/qub-java/72/qub-java.jar;C:/qub/qub/qub-build/72/qub-build.jar;C:/qub/qub/qub-test/36/qub-test.jar qub.ConsoleTestRunner ");
-                    test.assertContains(outputText, "VERBOSE: Tests exited with exit code 0.");
-                    test.assertContains(outputText, "Creating compiled sources jar file...");
-                    test.assertContains(outputText, "VERBOSE: Created C:/Users/dansc/Sources/qub-java-pack/outputs/qub-java-pack.jar.");
-                    test.assertContains(outputText, "Creating sources jar file...");
-                    test.assertContains(outputText, "VERBOSE: Created C:/Users/dansc/Sources/qub-java-pack/outputs/qub-java-pack.sources.jar.");
                     test.assertEqual("", error.asCharacterReadStream().getText().await());
                 });
             });
@@ -175,18 +294,26 @@ public interface QubPublishTests
 
     static void main(Console console)
     {
-        final QubBuild build = new QubBuild();
-        build.setJavaCompiler(new FakeJavaCompiler());
+        final QubBuild qubBuild = new QubBuild();
+        qubBuild.setJavaCompiler(new FakeJavaCompiler());
 
-        final QubTest test = new QubTest();
-        test.setJavaRunner(new FakeJavaRunner());
-        test.setQubBuild(build);
+        final QubTest qubTest = new QubTest();
+        qubTest.setJavaRunner(new FakeJavaRunner());
+        qubTest.setQubBuild(qubBuild);
 
-        final QubPublish pack = new QubPublish();
-        pack.setQubTest(test);
-        pack.setJarCreator(new FakeJarCreator());
-        pack.setShowTotalDuration(false);
+        final QubPack qubPack = new QubPack();
+        qubPack.setJarCreator(new FakeJarCreator());
+        qubPack.setQubTest(qubTest);
 
-        pack.main(console);
+        main(console, qubPack);
+    }
+
+    static void main(Console console, QubPack qubPack)
+    {
+        final QubPublish qubPublish = new QubPublish();
+        qubPublish.setQubPack(qubPack);
+        qubPublish.setShowTotalDuration(false);
+
+        qubPublish.main(console);
     }
 }
