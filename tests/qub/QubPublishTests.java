@@ -246,6 +246,10 @@ public interface QubPublishTests
                         ),
                         Strings.getLines(output.asCharacterReadStream().getText().await()));
                     test.assertEqual("", error.asCharacterReadStream().getText().await());
+                    test.assertFalse(fileSystem.fileExists("/qub/me/my-project/1/my-project.jar").await());
+                    test.assertFalse(fileSystem.fileExists("/qub/me/my-project/1/my-project.sources.jar").await());
+                    test.assertFalse(fileSystem.fileExists("/qub/me/my-project/1/project.json").await());
+                    test.assertFalse(fileSystem.fileExists("/qub/my-project.cmd").await());
                 });
 
                 runner.test("with simple success scenario", (Test test) ->
@@ -287,6 +291,231 @@ public interface QubPublishTests
                         ),
                         Strings.getLines(output.asCharacterReadStream().getText().await()));
                     test.assertEqual("", error.asCharacterReadStream().getText().await());
+                    test.assertEqual(
+                        Iterable.create(
+                            "Files:",
+                            "MyProject.class",
+                            ""),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/1/my-project.jar").await()));
+                    test.assertEqual(
+                        Iterable.create(
+                            "Files:",
+                            "MyProject.java",
+                            ""),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/1/my-project.sources.jar").await()));
+                    test.assertEqual(
+                        "{\"publisher\":\"me\",\"project\":\"my-project\",\"version\":\"1\",\"java\":{}}",
+                        fileSystem.getFileContentAsString("/qub/me/my-project/1/project.json").await());
+                    test.assertFalse(fileSystem.fileExists("/qub/my-project.cmd").await());
+                });
+
+                runner.test("with mainClass in project.json", (Test test) ->
+                {
+                    final InMemoryByteStream output = new InMemoryByteStream();
+                    final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
+                    fileSystem.createFolder("/qub/").await();
+                    fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
+                    final ProjectJSON projectJSON = new ProjectJSON();
+                    projectJSON.setProject("my-project");
+                    projectJSON.setPublisher("me");
+                    projectJSON.setVersion("1");
+                    projectJSON.setJava(new ProjectJSONJava()
+                        .setMainClass("MyProject"));
+                    fileSystem.setFileContentAsString(
+                        "/project.json",
+                        JSON.object(projectJSON::write).toString()).await();
+                    try (final Console console = new Console())
+                    {
+                        console.setOutputByteWriteStream(output);
+                        console.setErrorByteWriteStream(error);
+                        console.setFileSystem(fileSystem);
+                        console.setCurrentFolderPath(Path.parse("/"));
+                        console.setEnvironmentVariables(Map.<String,String>create()
+                            .set("QUB_HOME", "/qub/"));
+
+                        main(console);
+                        test.assertEqual(0, console.getExitCode());
+                    }
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Running tests...",
+                            "",
+                            "Creating sources jar file...",
+                            "Creating compiled sources jar file...",
+                            "Publishing..."
+                        ),
+                        Strings.getLines(output.asCharacterReadStream().getText().await()));
+                    test.assertEqual("", error.asCharacterReadStream().getText().await());
+                    test.assertEqual(
+                        Iterable.create(
+                            "Manifest file:",
+                            "META-INF/MANIFEST.MF",
+                            "",
+                            "Files:",
+                            "MyProject.class",
+                            ""),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/1/my-project.jar").await()));
+                    test.assertEqual(
+                        Iterable.create(
+                            "Files:",
+                            "MyProject.java",
+                            ""),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/1/my-project.sources.jar").await()));
+                    test.assertEqual(
+                        "{\"publisher\":\"me\",\"project\":\"my-project\",\"version\":\"1\",\"java\":{\"mainClass\":\"MyProject\"}}",
+                        fileSystem.getFileContentAsString("/qub/me/my-project/1/project.json").await());
+                    test.assertEqual(
+                        Iterable.create(
+                            "@echo OFF",
+                            "java -cp %~dp0me/my-project/1/my-project.jar MyProject %*"),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/my-project.cmd").await()));
+                });
+
+                runner.test("with mainClass and dependencies in project.json", (Test test) ->
+                {
+                    final InMemoryByteStream output = new InMemoryByteStream();
+                    final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
+                    fileSystem.createFolder("/qub/").await();
+                    fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
+                    final ProjectJSON projectJSON = new ProjectJSON();
+                    projectJSON.setProject("my-project");
+                    projectJSON.setPublisher("me");
+                    projectJSON.setVersion("1");
+                    projectJSON.setJava(new ProjectJSONJava()
+                        .setMainClass("MyProject")
+                        .setDependencies(Iterable.create(
+                            new Dependency()
+                                .setPublisher("me")
+                                .setProject("my-other-project")
+                                .setVersion("5"),
+                            new Dependency()
+                                .setPublisher("you")
+                                .setProject("stuff")
+                                .setVersion("7.3.1")
+                        )));
+                    fileSystem.setFileContentAsString(
+                        "/project.json",
+                        JSON.object(projectJSON::write).toString()).await();
+                    fileSystem.setFileContentAsString("/qub/me/my-other-project/5/my-other-project.jar", "hello").await();
+                    fileSystem.setFileContentAsString("/qub/you/stuff/7.3.1/stuff.jar", "hello2").await();
+                    try (final Console console = new Console())
+                    {
+                        console.setOutputByteWriteStream(output);
+                        console.setErrorByteWriteStream(error);
+                        console.setFileSystem(fileSystem);
+                        console.setCurrentFolderPath(Path.parse("/"));
+                        console.setEnvironmentVariables(Map.<String,String>create()
+                            .set("QUB_HOME", "/qub/"));
+
+                        main(console);
+                        test.assertEqual(0, console.getExitCode());
+                    }
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Running tests...",
+                            "",
+                            "Creating sources jar file...",
+                            "Creating compiled sources jar file...",
+                            "Publishing..."
+                        ),
+                        Strings.getLines(output.asCharacterReadStream().getText().await()));
+                    test.assertEqual("", error.asCharacterReadStream().getText().await());
+                    test.assertEqual(
+                        Iterable.create(
+                            "Manifest file:",
+                            "META-INF/MANIFEST.MF",
+                            "",
+                            "Files:",
+                            "MyProject.class",
+                            ""),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/1/my-project.jar").await()));
+                    test.assertEqual(
+                        Iterable.create(
+                            "Files:",
+                            "MyProject.java",
+                            ""),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/1/my-project.sources.jar").await()));
+                    test.assertEqual(
+                        "{\"publisher\":\"me\",\"project\":\"my-project\",\"version\":\"1\",\"java\":{\"mainClass\":\"MyProject\",\"dependencies\":[{\"publisher\":\"me\",\"project\":\"my-other-project\",\"version\":\"5\"},{\"publisher\":\"you\",\"project\":\"stuff\",\"version\":\"7.3.1\"}]}}",
+                        fileSystem.getFileContentAsString("/qub/me/my-project/1/project.json").await());
+                    test.assertEqual(
+                        Iterable.create(
+                            "@echo OFF",
+                            "java -cp %~dp0me/my-project/1/my-project.jar;%~dp0me/my-other-project/5/my-other-project.jar;%~dp0you/stuff/7.3.1/stuff.jar MyProject %*"),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/my-project.cmd").await()));
+                });
+
+                runner.test("with mainClass and shortcutName in project.json", (Test test) ->
+                {
+                    final InMemoryByteStream output = new InMemoryByteStream();
+                    final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
+                    fileSystem.createFolder("/qub/").await();
+                    fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
+                    final ProjectJSON projectJSON = new ProjectJSON();
+                    projectJSON.setProject("my-project");
+                    projectJSON.setPublisher("me");
+                    projectJSON.setVersion("1");
+                    projectJSON.setJava(new ProjectJSONJava()
+                        .setMainClass("MyProject")
+                        .setShortcutName("foo"));
+                    fileSystem.setFileContentAsString(
+                        "/project.json",
+                        JSON.object(projectJSON::write).toString()).await();
+                    try (final Console console = new Console())
+                    {
+                        console.setOutputByteWriteStream(output);
+                        console.setErrorByteWriteStream(error);
+                        console.setFileSystem(fileSystem);
+                        console.setCurrentFolderPath(Path.parse("/"));
+                        console.setEnvironmentVariables(Map.<String,String>create()
+                            .set("QUB_HOME", "/qub/"));
+
+                        main(console);
+                        test.assertEqual(0, console.getExitCode());
+                    }
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Running tests...",
+                            "",
+                            "Creating sources jar file...",
+                            "Creating compiled sources jar file...",
+                            "Publishing..."
+                        ),
+                        Strings.getLines(output.asCharacterReadStream().getText().await()));
+                    test.assertEqual("", error.asCharacterReadStream().getText().await());
+                    test.assertEqual(
+                        Iterable.create(
+                            "Manifest file:",
+                            "META-INF/MANIFEST.MF",
+                            "",
+                            "Files:",
+                            "MyProject.class",
+                            ""),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/1/my-project.jar").await()));
+                    test.assertEqual(
+                        Iterable.create(
+                            "Files:",
+                            "MyProject.java",
+                            ""),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/1/my-project.sources.jar").await()));
+                    test.assertEqual(
+                        "{\"publisher\":\"me\",\"project\":\"my-project\",\"version\":\"1\",\"java\":{\"mainClass\":\"MyProject\",\"shortcutName\":\"foo\"}}",
+                        fileSystem.getFileContentAsString("/qub/me/my-project/1/project.json").await());
+                    test.assertFalse(fileSystem.fileExists("/qub/my-project.cmd").await());
+                    test.assertEqual(
+                        Iterable.create(
+                            "@echo OFF",
+                            "java -cp %~dp0me/my-project/1/my-project.jar MyProject %*"),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/foo.cmd").await()));
                 });
             });
         });

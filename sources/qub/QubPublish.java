@@ -125,8 +125,39 @@ public class QubPublish
 
                             console.writeLine("Publishing...").await();
                             projectJsonFile.copyToFolder(versionFolder).await();
-                            compiledSourcesJarFile.copyToFolder(versionFolder).await();
+                            final File versionFolderCompiledSourcesJarFile = versionFolder.getFile(compiledSourcesJarFile.getName()).await();
+                            compiledSourcesJarFile.copyTo(versionFolderCompiledSourcesJarFile).await();
                             sourcesJarFile.copyToFolder(versionFolder).await();
+
+                            final ProjectJSONJava projectJsonJava = projectJSON.getJava();
+                            if (projectJsonJava != null)
+                            {
+                                final String mainClass = projectJsonJava.getMainClass();
+                                if (mainClass != null)
+                                {
+                                    String shortcutName = projectJsonJava.getShortcutName();
+                                    if (Strings.isNullOrEmpty(shortcutName))
+                                    {
+                                        shortcutName = projectJSON.getProject();
+                                    }
+
+                                    String classpath = "%~dp0" + versionFolderCompiledSourcesJarFile.relativeTo(qubFolder);
+                                    final Iterable<Dependency> dependencies = projectJsonJava.getDependencies();
+                                    if (!Iterable.isNullOrEmpty(dependencies))
+                                    {
+                                        for (final Dependency dependency : dependencies)
+                                        {
+                                            classpath += ";%~dp0" + dependency.getPublisher() + "/" + dependency.getProject() + "/" + dependency.getVersion() + "/" + dependency.getProject() + ".jar";
+                                        }
+                                    }
+
+                                    final File shortcutFile = qubFolder.getFile(shortcutName + ".cmd").await();
+                                    final String shortcutFileContents =
+                                        "@echo OFF\n" +
+                                        "java -cp " + classpath + " " + mainClass + " %*\n";
+                                    shortcutFile.setContentsAsString(shortcutFileContents).await();
+                                }
+                            }
                         }
                     }
                 }
