@@ -142,7 +142,7 @@ public class QubPublish
                                     }
 
                                     String classpath = "%~dp0" + versionFolderCompiledSourcesJarFile.relativeTo(qubFolder);
-                                    final Iterable<Dependency> dependencies = projectJsonJava.getDependencies();
+                                    final Iterable<Dependency> dependencies = QubBuild.getAllDependencies(qubFolder, projectJsonJava.getDependencies()).getKeys();
                                     if (!Iterable.isNullOrEmpty(dependencies))
                                     {
                                         for (final Dependency dependency : dependencies)
