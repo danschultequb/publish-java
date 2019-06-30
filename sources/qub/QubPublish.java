@@ -63,22 +63,22 @@ public class QubPublish
     {
         PreCondition.assertNotNull(console, "console");
 
-        if (shouldShowUsage(console))
+        final CommandLineParameters parameters = console.createCommandLineParameters();
+        final CommandLineParameter<Folder> folderToPublishParameter = parameters.addPositionalFolder("folder", console)
+            .setValueName("<folder-to-publish>")
+            .setDescription("The folder to publish. Defaults to the current folder.");
+        final CommandLineParameterProfiler profiler = parameters.addProfiler(console, QubPublish.class);
+        final CommandLineParameterBoolean help = parameters.addHelp();
+
+        if (help.getValue().await())
         {
-            console.writeLine("Usage: qub-publish [[-folder=]<folder-path-to-publish>] [-verbose]").await();
-            console.writeLine("  Used to publish packaged source and compiled code to the qub folder.").await();
-            console.writeLine("  -folder: The folder to publish. This can be specified either with the -folder").await();
-            console.writeLine("           argument name or without it.").await();
-            console.writeLine("  -verbose: Whether or not to show verbose logs.").await();
+            parameters.writeHelpLines(console, "qub-publish", "Used to published packaged source and compiled code to the qub folder.").await();
             console.setExitCode(-1);
         }
         else
         {
-            final boolean profiler = Profiler.takeProfilerArgument(console);
-            if (profiler)
-            {
-                Profiler.waitForProfiler(console, QubPublish.class).await();
-            }
+            profiler.await();
+            profiler.removeValue().await();
 
             final boolean showTotalDuration = getShowTotalDuration();
             final Stopwatch stopwatch = console.getStopwatch();
@@ -101,7 +101,7 @@ public class QubPublish
                     }
                     else
                     {
-                        final Folder folderToPublish = getFolderToPublish(console);
+                        final Folder folderToPublish = folderToPublishParameter.getValue().await();
                         final Folder outputFolder = folderToPublish.getFolder("outputs").await();
 
                         final File projectJsonFile = folderToPublish.getFile("project.json").await();
@@ -171,104 +171,6 @@ public class QubPublish
                 }
             }
         }
-    }
-
-    private static boolean shouldShowUsage(Console console)
-    {
-        PreCondition.assertNotNull(console, "console");
-
-        return console.getCommandLine().contains(
-            (CommandLineArgument argument) ->
-            {
-                final String argumentString = argument.toString();
-                return argumentString.equals("/?") || argumentString.equals("-?");
-            });
-    }
-
-    private static Path getFolderPathToPublish(Console console)
-    {
-        PreCondition.assertNotNull(console, "console");
-
-        Path result = null;
-        final CommandLine commandLine = console.getCommandLine();
-        if (commandLine.any())
-        {
-            CommandLineArgument folderArgument = commandLine.get("folder");
-            if (folderArgument == null)
-            {
-                folderArgument = commandLine.getArguments()
-                    .first((CommandLineArgument argument) -> argument.getName() == null);
-            }
-            if (folderArgument != null)
-            {
-                result = Path.parse(folderArgument.getValue());
-            }
-        }
-
-        if (result == null)
-        {
-            result = console.getCurrentFolderPath();
-        }
-
-        if (!result.isRooted())
-        {
-            result = console.getCurrentFolderPath().resolve(result).await();
-        }
-
-        PostCondition.assertNotNull(result, "result");
-        PostCondition.assertTrue(result.isRooted(), "result.isRooted()");
-
-        return result;
-    }
-
-    private static Folder getFolderToPublish(Console console)
-    {
-        PreCondition.assertNotNull(console, "console");
-
-        final Path folderPathToPublish = getFolderPathToPublish(console);
-        final FileSystem fileSystem = console.getFileSystem();
-        final Folder result = fileSystem.getFolder(folderPathToPublish).await();
-
-        PostCondition.assertNotNull(result, "result");
-
-        return result;
-    }
-
-    public static boolean isVerbose(Console console)
-    {
-        boolean result = false;
-
-        CommandLineArgument verboseArgument = console.getCommandLine().get("verbose");
-        if (verboseArgument != null)
-        {
-            final String verboseArgumentValue = verboseArgument.getValue();
-            result = Strings.isNullOrEmpty(verboseArgumentValue) ||
-                Booleans.isTrue(java.lang.Boolean.valueOf(verboseArgumentValue));
-        }
-
-        return result;
-    }
-
-    public static Result<Void> verbose(Console console, String message)
-    {
-        return verbose(console, false, message);
-    }
-
-    public static Result<Void> verbose(Console console, boolean showTimestamp, String message)
-    {
-        PreCondition.assertNotNull(console, "console");
-        PreCondition.assertNotNull(message, "message");
-
-        Result<Void> result = Result.success();
-        if (isVerbose(console))
-        {
-            result = console.writeLine("VERBOSE" + (showTimestamp ? "(" + System.currentTimeMillis() + ")" : "") + ": " + message)
-                .then(() -> {});
-        }
-
-        PostCondition.assertNotNull(result, "result");
-
-        return result;
     }
 
     public static Result<Void> error(Console console, String message)

@@ -70,35 +70,11 @@ public interface QubPublishTests
                         () -> main((Console)null));
                 });
 
-                runner.test("with \"/?\"", (Test test) ->
-                {
-                    final InMemoryByteStream output = new InMemoryByteStream();
-                    final InMemoryByteStream error = new InMemoryByteStream();
-                    try (final Console console = new Console(Iterable.create("/?")))
-                    {
-                        console.setOutputByteWriteStream(output);
-                        console.setErrorByteWriteStream(error);
-
-                        main(console);
-                        test.assertEqual(-1, console.getExitCode());
-                    }
-                    test.assertEqual(
-                        Iterable.create(
-                            "Usage: qub-publish [[-folder=]<folder-path-to-publish>] [-verbose]",
-                            "  Used to publish packaged source and compiled code to the qub folder.",
-                            "  -folder: The folder to publish. This can be specified either with the -folder",
-                            "           argument name or without it.",
-                            "  -verbose: Whether or not to show verbose logs."
-                        ),
-                        Strings.getLines(output.asCharacterReadStream().getText().await()));
-                    test.assertEqual("", error.asCharacterReadStream().getText().await());
-                });
-
                 runner.test("with \"-?\"", (Test test) ->
                 {
                     final InMemoryByteStream output = new InMemoryByteStream();
                     final InMemoryByteStream error = new InMemoryByteStream();
-                    try (final Console console = new Console(Iterable.create("-?")))
+                    try (final Console console = new Console(CommandLineArguments.create("-?")))
                     {
                         console.setOutputByteWriteStream(output);
                         console.setErrorByteWriteStream(error);
@@ -108,12 +84,11 @@ public interface QubPublishTests
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Usage: qub-publish [[-folder=]<folder-path-to-publish>] [-verbose]",
-                            "  Used to publish packaged source and compiled code to the qub folder.",
-                            "  -folder: The folder to publish. This can be specified either with the -folder",
-                            "           argument name or without it.",
-                            "  -verbose: Whether or not to show verbose logs."
-                        ),
+                            "Usage: qub-publish [[--folder=]<folder-to-publish>] [--profiler] [--help]",
+                            "  Used to published packaged source and compiled code to the qub folder.",
+                            "  --folder: The folder to publish. Defaults to the current folder.",
+                            "  --profiler: Whether or not this application should pause before it is run to allow a profiler to be attached.",
+                            "  --help(?): Show the help message for this application."),
                         Strings.getLines(output.asCharacterReadStream().getText().await()));
                     test.assertEqual("", error.asCharacterReadStream().getText().await());
                 });
