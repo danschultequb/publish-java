@@ -108,12 +108,36 @@ public class QubPublish
                         final ProjectJSON projectJSON = ProjectJSON.parse(projectJsonFile).await();
                         final String publisher = projectJSON.getPublisher();
                         final String project = projectJSON.getProject();
-                        final String version = projectJSON.getVersion();
-
+                        String version = projectJSON.getVersion();
                         final Folder qubFolder = console.getFileSystem().getFolder(qubHome).await();
-                        final Folder publisherFolder = qubFolder.getFolder(publisher).await();
-                        final Folder projectFolder = publisherFolder.getFolder(project).await();
-                        final Folder versionFolder = projectFolder.getFolder(version).await();
+
+                        if (Strings.isNullOrEmpty(version))
+                        {
+                            version = getLatestVersion(qubFolder, publisher, project)
+                                .catchError(NotFoundException.class)
+                                .await();
+                            if (!Strings.isNullOrEmpty(version))
+                            {
+                                final Integer intVersion = Integers.parse(version).catchError().await();
+                                if (intVersion == null)
+                                {
+                                    version = null;
+                                }
+                                else
+                                {
+                                    version = Integers.toString(intVersion + 1);
+                                }
+                            }
+                            if (Strings.isNullOrEmpty(version))
+                            {
+                                version = "1";
+                            }
+                        }
+
+                        final Folder versionFolder = qubFolder
+                            .getFolder(publisher).await()
+                            .getFolder(project).await()
+                            .getFolder(version).await();
                         if (versionFolder.exists().await())
                         {
                             error(console, "This package (" + publisher + "/" + project + ":" + version + ") can't be published because a package with that signature already exists.").await();
@@ -122,12 +146,16 @@ public class QubPublish
                         {
                             final File compiledSourcesJarFile = outputFolder.getFile(project + ".jar").await();
                             final File sourcesJarFile = outputFolder.getFile(project + ".sources.jar").await();
+                            final File testsJarFile = outputFolder.getFile(project + ".tests.jar").await();
 
-                            console.writeLine("Publishing...").await();
+                            console.writeLine("Publishing " + publisher + "/" + project + "@" + version + "...").await();
                             projectJsonFile.copyToFolder(versionFolder).await();
                             final File versionFolderCompiledSourcesJarFile = versionFolder.getFile(compiledSourcesJarFile.getName()).await();
                             compiledSourcesJarFile.copyTo(versionFolderCompiledSourcesJarFile).await();
                             sourcesJarFile.copyToFolder(versionFolder).await();
+                            testsJarFile.copyToFolder(versionFolder)
+                                .catchError(FileNotFoundException.class)
+                                .await();
 
                             final ProjectJSONJava projectJsonJava = projectJSON.getJava();
                             if (projectJsonJava != null)
@@ -158,6 +186,51 @@ public class QubPublish
                                     shortcutFile.setContentsAsString(shortcutFileContents).await();
                                 }
                             }
+
+                            final List<String> projectsToUpdate = List.create();
+                            final Iterable<Folder> publisherFolders = qubFolder.getFolders().await();
+                            for (final Folder publisherFolder : publisherFolders)
+                            {
+                                final Iterable<Folder> projectFolders = publisherFolder.getFolders().await();
+                                for (final Folder projectFolder : projectFolders)
+                                {
+                                    final Iterable<Folder> versionFolders = projectFolder.getFolders().await();
+                                    final Folder latestVersionFolder = versionFolders.maximum(QubPublish::compareVersionFolders);
+                                    if (latestVersionFolder != null)
+                                    {
+                                        final File publishedProjectJsonFile = latestVersionFolder.getFile("project.json").await();
+                                        final ProjectJSON publishedProjectJson = ProjectJSON.parse(publishedProjectJsonFile)
+                                            .catchError(FileNotFoundException.class)
+                                            .await();
+                                        if (publishedProjectJson != null)
+                                        {
+                                            final ProjectJSONJava publishedProjectJsonJava = publishedProjectJson.getJava();
+                                            if (publishedProjectJsonJava != null)
+                                            {
+                                                final Iterable<Dependency> dependencies = publishedProjectJsonJava.getDependencies();
+                                                if (!Iterable.isNullOrEmpty(dependencies))
+                                                {
+                                                    final Dependency dependency = dependencies.first((Dependency d) ->
+                                                        Comparer.equal(d.getPublisher(), publisher) &&
+                                                            Comparer.equal(d.getProject(), project));
+                                                    if (dependency != null)
+                                                    {
+                                                        projectsToUpdate.add(publishedProjectJson.getPublisher() + "/" + publishedProjectJson.getProject() + "@" + publishedProjectJson.getVersion());
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if (!Iterable.isNullOrEmpty(projectsToUpdate))
+                            {
+                                console.writeLine("The following projects should be updated to use " + publisher + "/" + project + "@" + version + ":").await();
+                                for (final String projectToUpdate : projectsToUpdate)
+                                {
+                                    console.writeLine("  " + projectToUpdate).await();
+                                }
+                            }
                         }
                     }
                 }
@@ -171,6 +244,13 @@ public class QubPublish
                 }
             }
         }
+    }
+
+    private static Comparison compareVersionFolders(Folder lhs, Folder rhs)
+    {
+        final Integer lhsValue = Integers.parse(lhs.getName()).catchError().await();
+        final Integer rhsValue = Integers.parse(rhs.getName()).catchError().await();
+        return Comparer.compare(lhsValue, rhsValue);
     }
 
     public static Result<Void> error(Console console, String message)
@@ -194,5 +274,32 @@ public class QubPublish
     public static void main(String[] args)
     {
         Console.run(args, (Console console) -> new QubPublish().main(console));
+    }
+
+    private static Result<Folder> getLatestVersionFolder(Folder qubFolder, String publisher, String project)
+    {
+        PreCondition.assertNotNull(qubFolder, "qubFolder");
+        PreCondition.assertNotNullAndNotEmpty(publisher, "publisher");
+        PreCondition.assertNotNullAndNotEmpty(project, "project");
+
+        return Result.create(() ->
+        {
+            final Folder projectFolder = qubFolder
+                .getFolder(publisher).await()
+                .getFolder(project).await();
+            final Iterable<Folder> projectVersionFolders = projectFolder.getFolders().await();
+            final Folder maximumVersionFolder = projectVersionFolders.maximum(QubPublish::compareVersionFolders);
+            if (maximumVersionFolder == null)
+            {
+                throw new NotFoundException("No project has been published for " + Strings.quote(publisher) + " with the name " + Strings.quote(project) + ".");
+            }
+            return maximumVersionFolder;
+        });
+    }
+
+    private static Result<String> getLatestVersion(Folder qubFolder, String publisher, String project)
+    {
+        return getLatestVersionFolder(qubFolder, publisher, project)
+            .then(Folder::getName);
     }
 }

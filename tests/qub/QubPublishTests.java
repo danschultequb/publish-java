@@ -262,7 +262,7 @@ public interface QubPublishTests
                             "",
                             "Creating sources jar file...",
                             "Creating compiled sources jar file...",
-                            "Publishing..."
+                            "Publishing me/my-project@1..."
                         ),
                         Strings.getLines(output.asCharacterReadStream().getText().await()));
                     test.assertEqual("", error.asCharacterReadStream().getText().await());
@@ -320,7 +320,7 @@ public interface QubPublishTests
                             "",
                             "Creating sources jar file...",
                             "Creating compiled sources jar file...",
-                            "Publishing..."
+                            "Publishing me/my-project@1..."
                         ),
                         Strings.getLines(output.asCharacterReadStream().getText().await()));
                     test.assertEqual("", error.asCharacterReadStream().getText().await());
@@ -397,7 +397,7 @@ public interface QubPublishTests
                             "",
                             "Creating sources jar file...",
                             "Creating compiled sources jar file...",
-                            "Publishing..."
+                            "Publishing me/my-project@1..."
                         ),
                         Strings.getLines(output.asCharacterReadStream().getText().await()));
                     test.assertEqual("", error.asCharacterReadStream().getText().await());
@@ -485,7 +485,7 @@ public interface QubPublishTests
                             "",
                             "Creating sources jar file...",
                             "Creating compiled sources jar file...",
-                            "Publishing..."
+                            "Publishing me/a@1..."
                         ),
                         Strings.getLines(output.asCharacterReadStream().getText().await()));
                     test.assertEqual("", error.asCharacterReadStream().getText().await());
@@ -551,7 +551,7 @@ public interface QubPublishTests
                             "",
                             "Creating sources jar file...",
                             "Creating compiled sources jar file...",
-                            "Publishing..."
+                            "Publishing me/my-project@1..."
                         ),
                         Strings.getLines(output.asCharacterReadStream().getText().await()));
                     test.assertEqual("", error.asCharacterReadStream().getText().await());
@@ -579,6 +579,84 @@ public interface QubPublishTests
                             "@echo OFF",
                             "java -cp %~dp0me/my-project/1/my-project.jar MyProject %*"),
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/foo.cmd").await()));
+                });
+
+                runner.test("with dependent and non-dependent published project", (Test test) ->
+                {
+                    final InMemoryByteStream output = new InMemoryByteStream();
+                    final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
+                    fileSystem.createFolder("/qub/").await();
+                    final ProjectJSON dependentProjectJson = new ProjectJSON()
+                        .setPublisher("me")
+                        .setProject("other-project")
+                        .setVersion("10")
+                        .setJava(new ProjectJSONJava()
+                            .setDependencies(Iterable.create(
+                                new Dependency()
+                                    .setPublisher("me")
+                                    .setProject("my-project")
+                                    .setVersion("1")
+                            )));
+                    fileSystem.setFileContentAsString("/qub/me/other-project/10/project.json", JSON.object(dependentProjectJson::write).toString()).await();
+                    final ProjectJSON nonDependentProjectJson = new ProjectJSON()
+                        .setPublisher("me")
+                        .setProject("my-other-project")
+                        .setVersion("5")
+                        .setJava(new ProjectJSONJava()
+                            .setDependencies(Iterable.create()));
+                    fileSystem.setFileContentAsString("/qub/me/my-other-project/5/project.json", JSON.object(nonDependentProjectJson::write).toString()).await();
+                    fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
+                    final ProjectJSON projectJSON = new ProjectJSON()
+                        .setProject("my-project")
+                        .setPublisher("me")
+                        .setVersion("2")
+                        .setJava(new ProjectJSONJava());
+                    fileSystem.setFileContentAsString(
+                        "/project.json",
+                        JSON.object(projectJSON::write).toString()).await();
+                    try (final Console console = new Console())
+                    {
+                        console.setOutputByteWriteStream(output);
+                        console.setErrorByteWriteStream(error);
+                        console.setFileSystem(fileSystem);
+                        console.setCurrentFolderPath(Path.parse("/"));
+                        console.setEnvironmentVariables(Map.<String,String>create()
+                            .set("QUB_HOME", "/qub/"));
+
+                        main(console);
+                        test.assertEqual(0, console.getExitCode());
+                    }
+                    test.assertEqual(
+                        Iterable.create(
+                            "Compiling...",
+                            "Running tests...",
+                            "",
+                            "Creating sources jar file...",
+                            "Creating compiled sources jar file...",
+                            "Publishing me/my-project@2...",
+                            "The following projects should be updated to use me/my-project@2:",
+                            "  me/other-project@10"
+                        ),
+                        Strings.getLines(output.asCharacterReadStream().getText().await()));
+                    test.assertEqual("", error.asCharacterReadStream().getText().await());
+                    test.assertEqual(
+                        Iterable.create(
+                            "Files:",
+                            "MyProject.class",
+                            ""),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/2/my-project.jar").await()));
+                    test.assertEqual(
+                        Iterable.create(
+                            "Files:",
+                            "MyProject.java",
+                            ""),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/2/my-project.sources.jar").await()));
+                    test.assertEqual(
+                        "{\"publisher\":\"me\",\"project\":\"my-project\",\"version\":\"2\",\"java\":{}}",
+                        fileSystem.getFileContentAsString("/qub/me/my-project/2/project.json").await());
+                    test.assertFalse(fileSystem.fileExists("/qub/my-project.cmd").await());
                 });
             });
         });
