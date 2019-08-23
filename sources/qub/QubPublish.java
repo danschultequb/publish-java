@@ -179,10 +179,16 @@ public class QubPublish
                                         }
                                     }
 
+                                    String capturedJVMClasspath = "";
+                                    if (Booleans.isTrue(projectJsonJava.getCaptureVMArguments()))
+                                    {
+                                        capturedJVMClasspath = " --jvm.classpath=" + classpath;
+                                    }
+
                                     final File shortcutFile = qubFolder.getFile(shortcutName + ".cmd").await();
                                     final String shortcutFileContents =
                                         "@echo OFF\n" +
-                                        "java -cp " + classpath + " " + mainClass + " %*\n";
+                                        "java -classpath " + classpath + " " + mainClass + capturedJVMClasspath + " %*\n";
                                     shortcutFile.setContentsAsString(shortcutFileContents).await();
                                 }
                             }
