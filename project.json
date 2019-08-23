@@ -1,16 +1,17 @@
 {
   "publisher": "qub",
   "project": "qub-java-publish",
-  "version": "14",
+  "version": "15",
   "java": {
     "mainClass": "qub.QubPublish",
     "shortcutName": "qub-publish",
     "version": "1.8",
+    "captureVMArguments": true,
     "dependencies": [
       {
         "publisher": "qub",
         "project": "qub-java-pack",
-        "version": "15"
+        "version": "16"
       }
     ]
   }
