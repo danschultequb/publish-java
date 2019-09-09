@@ -121,12 +121,7 @@ public interface QubPublishTests
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Compiling...",
-                            "Running tests...",
-                            "",
-                            "Creating sources jar file...",
-                            "Creating compiled sources jar file...",
-                            "ERROR: Cannot publish without a QUB_HOME environment variable."
+                            "ERROR: Can't publish without a QUB_HOME environment variable."
                         ),
                         Strings.getLines(output.asCharacterReadStream().getText().await()));
                     test.assertEqual("", error.asCharacterReadStream().getText().await());

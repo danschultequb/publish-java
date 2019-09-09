@@ -88,18 +88,18 @@ public class QubPublish
             }
             try
             {
-                final QubPack qubPack = getQubPack();
-                qubPack.setShowTotalDuration(false);
-                qubPack.main(console);
-
-                if (console.getExitCode() == 0)
+                final String qubHome = console.getEnvironmentVariable("QUB_HOME");
+                if (Strings.isNullOrEmpty(qubHome))
                 {
-                    final String qubHome = console.getEnvironmentVariable("QUB_HOME");
-                    if (Strings.isNullOrEmpty(qubHome))
-                    {
-                        error(console, "Cannot publish without a QUB_HOME environment variable.").await();
-                    }
-                    else
+                    error(console, "Can't publish without a QUB_HOME environment variable.").await();
+                }
+                else
+                {
+                    final QubPack qubPack = getQubPack();
+                    qubPack.setShowTotalDuration(false);
+                    qubPack.main(console);
+
+                    if (console.getExitCode() == 0)
                     {
                         final Folder folderToPublish = folderToPublishParameter.getValue().await();
                         final Folder outputFolder = folderToPublish.getFolder("outputs").await();
