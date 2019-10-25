@@ -88,7 +88,9 @@ public class QubPublish
             }
             try
             {
-                final String qubHome = console.getEnvironmentVariable("QUB_HOME");
+                final String qubHome = console.getEnvironmentVariable("QUB_HOME")
+                    .catchError(NotFoundException.class)
+                    .await();
                 if (Strings.isNullOrEmpty(qubHome))
                 {
                     error(console, "Can't publish without a QUB_HOME environment variable.").await();

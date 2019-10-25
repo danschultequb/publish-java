@@ -114,7 +114,7 @@ public interface QubPublishTests
                         console.setErrorByteWriteStream(error);
                         console.setFileSystem(fileSystem);
                         console.setCurrentFolderPath(Path.parse("/"));
-                        console.setEnvironmentVariables(Map.create());
+                        console.setEnvironmentVariables(new EnvironmentVariables());
 
                         main(console);
                         test.assertEqual(1, console.getExitCode());
@@ -148,33 +148,42 @@ public interface QubPublishTests
                         console.setErrorByteWriteStream(error);
                         console.setFileSystem(fileSystem);
                         console.setCurrentFolderPath(Path.parse("/"));
-                        console.setEnvironmentVariables(Map.<String,String>create()
+                        console.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
 
-                        final QubBuild qubBuild = new QubBuild();
-                        qubBuild.setJavaCompiler(new FakeJavaCompiler());
+                        final Folder currentFolder = console.getCurrentFolder().await();
+                        console.setProcessFactory(new FakeProcessFactory(console.getParallelAsyncRunner(), currentFolder)
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(currentFolder.getFolder("outputs").await())
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFile("sources/MyProject.java")
+                                .setFunctionAutomatically()));
 
                         final QubTest qubTest = new QubTest();
                         final FakeJavaRunner javaRunner = new FakeJavaRunner();
                         javaRunner.setExitCode(1);
                         qubTest.setJavaRunner(javaRunner);
-                        qubTest.setQubBuild(qubBuild);
 
                         final QubPack qubPack = new QubPack();
                         qubPack.setQubTest(qubTest);
                         qubPack.setJarCreator(new FakeJarCreator());
 
                         main(console, qubPack);
+                        
+                        test.assertEqual(
+                            Iterable.create(
+                                "Compiling 1 file...",
+                                "Running tests...",
+                                ""
+                            ),
+                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+                    
                         test.assertEqual(1, console.getExitCode());
                     }
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "Running tests...",
-                            ""
-                        ),
-                        Strings.getLines(output.asCharacterReadStream().getText().await()));
-                    test.assertEqual("", error.asCharacterReadStream().getText().await());
                 });
 
                 runner.test("with already existing version folder", (Test test) ->
@@ -199,23 +208,36 @@ public interface QubPublishTests
                         console.setErrorByteWriteStream(error);
                         console.setFileSystem(fileSystem);
                         console.setCurrentFolderPath(Path.parse("/"));
-                        console.setEnvironmentVariables(Map.<String,String>create()
+                        console.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
 
+                        final Folder currentFolder = console.getCurrentFolder().await();
+                        console.setProcessFactory(new FakeProcessFactory(console.getParallelAsyncRunner(), currentFolder)
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(currentFolder.getFolder("outputs").await())
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFile("sources/MyProject.java")
+                                .setFunctionAutomatically()));
+
                         main(console);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "Compiling 1 file...",
+                                "Running tests...",
+                                "",
+                                "Creating sources jar file...",
+                                "Creating compiled sources jar file...",
+                                "ERROR: This package (me/my-project:1) can't be published because a package with that signature already exists."
+                            ),
+                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+
                         test.assertEqual(1, console.getExitCode());
                     }
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "Running tests...",
-                            "",
-                            "Creating sources jar file...",
-                            "Creating compiled sources jar file...",
-                            "ERROR: This package (me/my-project:1) can't be published because a package with that signature already exists."
-                        ),
-                        Strings.getLines(output.asCharacterReadStream().getText().await()));
-                    test.assertEqual("", error.asCharacterReadStream().getText().await());
                     test.assertFalse(fileSystem.fileExists("/qub/me/my-project/1/my-project.jar").await());
                     test.assertFalse(fileSystem.fileExists("/qub/me/my-project/1/my-project.sources.jar").await());
                     test.assertFalse(fileSystem.fileExists("/qub/me/my-project/1/project.json").await());
@@ -244,23 +266,36 @@ public interface QubPublishTests
                         console.setErrorByteWriteStream(error);
                         console.setFileSystem(fileSystem);
                         console.setCurrentFolderPath(Path.parse("/"));
-                        console.setEnvironmentVariables(Map.<String,String>create()
+                        console.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
 
+                        final Folder currentFolder = console.getCurrentFolder().await();
+                        console.setProcessFactory(new FakeProcessFactory(console.getParallelAsyncRunner(), currentFolder)
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(currentFolder.getFolder("outputs").await())
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFile("sources/MyProject.java")
+                                .setFunctionAutomatically()));
+
                         main(console);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "Compiling 1 file...",
+                                "Running tests...",
+                                "",
+                                "Creating sources jar file...",
+                                "Creating compiled sources jar file...",
+                                "Publishing me/my-project@1..."
+                            ),
+                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+
                         test.assertEqual(0, console.getExitCode());
                     }
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "Running tests...",
-                            "",
-                            "Creating sources jar file...",
-                            "Creating compiled sources jar file...",
-                            "Publishing me/my-project@1..."
-                        ),
-                        Strings.getLines(output.asCharacterReadStream().getText().await()));
-                    test.assertEqual("", error.asCharacterReadStream().getText().await());
                     test.assertEqual(
                         Iterable.create(
                             "Files:",
@@ -287,12 +322,12 @@ public interface QubPublishTests
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
                     fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
-                    final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setProject("my-project");
-                    projectJSON.setPublisher("me");
-                    projectJSON.setVersion("1");
-                    projectJSON.setJava(new ProjectJSONJava()
-                        .setMainClass("MyProject"));
+                    final ProjectJSON projectJSON = new ProjectJSON()
+                        .setProject("my-project")
+                        .setPublisher("me")
+                        .setVersion("1")
+                        .setJava(new ProjectJSONJava()
+                            .setMainClass("MyProject"));
                     fileSystem.setFileContentAsString(
                         "/project.json",
                         JSON.object(projectJSON::write).toString()).await();
@@ -302,23 +337,36 @@ public interface QubPublishTests
                         console.setErrorByteWriteStream(error);
                         console.setFileSystem(fileSystem);
                         console.setCurrentFolderPath(Path.parse("/"));
-                        console.setEnvironmentVariables(Map.<String,String>create()
+                        console.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
 
+                        final Folder currentFolder = console.getCurrentFolder().await();
+                        console.setProcessFactory(new FakeProcessFactory(console.getParallelAsyncRunner(), currentFolder)
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(currentFolder.getFolder("outputs").await())
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFile("sources/MyProject.java")
+                                .setFunctionAutomatically()));
+
                         main(console);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "Compiling 1 file...",
+                                "Running tests...",
+                                "",
+                                "Creating sources jar file...",
+                                "Creating compiled sources jar file...",
+                                "Publishing me/my-project@1..."
+                            ),
+                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+
                         test.assertEqual(0, console.getExitCode());
                     }
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "Running tests...",
-                            "",
-                            "Creating sources jar file...",
-                            "Creating compiled sources jar file...",
-                            "Publishing me/my-project@1..."
-                        ),
-                        Strings.getLines(output.asCharacterReadStream().getText().await()));
-                    test.assertEqual("", error.asCharacterReadStream().getText().await());
                     test.assertEqual(
                         Iterable.create(
                             "Manifest file:",
@@ -368,23 +416,36 @@ public interface QubPublishTests
                         console.setErrorByteWriteStream(error);
                         console.setFileSystem(fileSystem);
                         console.setCurrentFolderPath(Path.parse("/"));
-                        console.setEnvironmentVariables(Map.<String,String>create()
+                        console.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
 
+                        final Folder currentFolder = console.getCurrentFolder().await();
+                        console.setProcessFactory(new FakeProcessFactory(console.getParallelAsyncRunner(), currentFolder)
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(currentFolder.getFolder("outputs").await())
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFile("sources/MyProject.java")
+                                .setFunctionAutomatically()));
+
                         main(console);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "Compiling 1 file...",
+                                "Running tests...",
+                                "",
+                                "Creating sources jar file...",
+                                "Creating compiled sources jar file...",
+                                "Publishing me/my-project@1..."
+                            ),
+                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+
                         test.assertEqual(0, console.getExitCode());
                     }
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "Running tests...",
-                            "",
-                            "Creating sources jar file...",
-                            "Creating compiled sources jar file...",
-                            "Publishing me/my-project@1..."
-                        ),
-                        Strings.getLines(output.asCharacterReadStream().getText().await()));
-                    test.assertEqual("", error.asCharacterReadStream().getText().await());
                     test.assertEqual(
                         Iterable.create(
                             "Manifest file:",
@@ -445,23 +506,39 @@ public interface QubPublishTests
                         console.setErrorByteWriteStream(error);
                         console.setFileSystem(fileSystem);
                         console.setCurrentFolderPath(Path.parse("/"));
-                        console.setEnvironmentVariables(Map.<String,String>create()
+                        console.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
 
+                        final Folder currentFolder = console.getCurrentFolder().await();
+                        console.setProcessFactory(new FakeProcessFactory(console.getParallelAsyncRunner(), currentFolder)
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(currentFolder.getFolder("outputs").await())
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath(Iterable.create(
+                                    "/outputs",
+                                    "/qub/me/my-other-project/5/my-other-project.jar",
+                                    "/qub/you/stuff/7.3.1/stuff.jar"))
+                                .addSourceFile("sources/MyProject.java")
+                                .setFunctionAutomatically()));
+
                         main(console);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "Compiling 1 file...",
+                                "Running tests...",
+                                "",
+                                "Creating sources jar file...",
+                                "Creating compiled sources jar file...",
+                                "Publishing me/my-project@1..."
+                            ),
+                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+
                         test.assertEqual(0, console.getExitCode());
                     }
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "Running tests...",
-                            "",
-                            "Creating sources jar file...",
-                            "Creating compiled sources jar file...",
-                            "Publishing me/my-project@1..."
-                        ),
-                        Strings.getLines(output.asCharacterReadStream().getText().await()));
-                    test.assertEqual("", error.asCharacterReadStream().getText().await());
                     test.assertEqual(
                         Iterable.create(
                             "Manifest file:",
@@ -495,23 +572,22 @@ public interface QubPublishTests
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
                     fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
-                    final ProjectJSON projectJSON = new ProjectJSON();
-                    projectJSON.setProject("my-project");
-                    projectJSON.setPublisher("me");
-                    projectJSON.setVersion("1");
-                    projectJSON.setJava(new ProjectJSONJava()
-                        .setMainClass("MyProject")
-                        .setCaptureVMArguments(true)
-                        .setDependencies(Iterable.create(
-                            new Dependency()
-                                .setPublisher("me")
-                                .setProject("my-other-project")
-                                .setVersion("5"),
-                            new Dependency()
-                                .setPublisher("you")
-                                .setProject("stuff")
-                                .setVersion("7.3.1")
-                        )));
+                    final ProjectJSON projectJSON = new ProjectJSON()
+                        .setProject("my-project")
+                        .setPublisher("me")
+                        .setVersion("1")
+                        .setJava(new ProjectJSONJava()
+                            .setMainClass("MyProject")
+                            .setCaptureVMArguments(true)
+                            .setDependencies(Iterable.create(
+                                new Dependency()
+                                    .setPublisher("me")
+                                    .setProject("my-other-project")
+                                    .setVersion("5"),
+                                new Dependency()
+                                    .setPublisher("you")
+                                    .setProject("stuff")
+                                    .setVersion("7.3.1"))));
                     fileSystem.setFileContentAsString(
                         "/project.json",
                         JSON.object(projectJSON::write).toString()).await();
@@ -523,23 +599,39 @@ public interface QubPublishTests
                         console.setErrorByteWriteStream(error);
                         console.setFileSystem(fileSystem);
                         console.setCurrentFolderPath(Path.parse("/"));
-                        console.setEnvironmentVariables(Map.<String,String>create()
+                        console.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
 
+                        final Folder currentFolder = console.getCurrentFolder().await();
+                        console.setProcessFactory(new FakeProcessFactory(console.getParallelAsyncRunner(), currentFolder)
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(currentFolder.getFolder("outputs").await())
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath(Iterable.create(
+                                    "/outputs",
+                                    "/qub/me/my-other-project/5/my-other-project.jar",
+                                    "/qub/you/stuff/7.3.1/stuff.jar"))
+                                .addSourceFile("sources/MyProject.java")
+                                .setFunctionAutomatically()));
+
                         main(console);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "Compiling 1 file...",
+                                "Running tests...",
+                                "",
+                                "Creating sources jar file...",
+                                "Creating compiled sources jar file...",
+                                "Publishing me/my-project@1..."
+                            ),
+                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+
                         test.assertEqual(0, console.getExitCode());
                     }
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "Running tests...",
-                            "",
-                            "Creating sources jar file...",
-                            "Creating compiled sources jar file...",
-                            "Publishing me/my-project@1..."
-                        ),
-                        Strings.getLines(output.asCharacterReadStream().getText().await()));
-                    test.assertEqual("", error.asCharacterReadStream().getText().await());
                     test.assertEqual(
                         Iterable.create(
                             "Manifest file:",
@@ -611,23 +703,36 @@ public interface QubPublishTests
                         console.setErrorByteWriteStream(error);
                         console.setFileSystem(fileSystem);
                         console.setCurrentFolderPath(Path.parse("/"));
-                        console.setEnvironmentVariables(Map.<String,String>create()
+                        console.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
 
+                        final Folder currentFolder = console.getCurrentFolder().await();
+                        console.setProcessFactory(new FakeProcessFactory(console.getParallelAsyncRunner(), currentFolder)
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(currentFolder.getFolder("outputs").await())
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath(Iterable.create("/outputs", "/qub/me/b/5/b.jar", "/qub/me/c/7/c.jar"))
+                                .addSourceFile("sources/MyProject.java")
+                                .setFunctionAutomatically()));
+
                         main(console);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "Compiling 1 file...",
+                                "Running tests...",
+                                "",
+                                "Creating sources jar file...",
+                                "Creating compiled sources jar file...",
+                                "Publishing me/a@1..."
+                            ),
+                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+
                         test.assertEqual(0, console.getExitCode());
                     }
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "Running tests...",
-                            "",
-                            "Creating sources jar file...",
-                            "Creating compiled sources jar file...",
-                            "Publishing me/a@1..."
-                        ),
-                        Strings.getLines(output.asCharacterReadStream().getText().await()));
-                    test.assertEqual("", error.asCharacterReadStream().getText().await());
                     test.assertEqual(
                         Iterable.create(
                             "Manifest file:",
@@ -677,23 +782,36 @@ public interface QubPublishTests
                         console.setErrorByteWriteStream(error);
                         console.setFileSystem(fileSystem);
                         console.setCurrentFolderPath(Path.parse("/"));
-                        console.setEnvironmentVariables(Map.<String,String>create()
+                        console.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
 
+                        final Folder currentFolder = console.getCurrentFolder().await();
+                        console.setProcessFactory(new FakeProcessFactory(console.getParallelAsyncRunner(), currentFolder)
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(currentFolder.getFolder("outputs").await())
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFile("sources/MyProject.java")
+                                .setFunctionAutomatically()));
+
                         main(console);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "Compiling 1 file...",
+                                "Running tests...",
+                                "",
+                                "Creating sources jar file...",
+                                "Creating compiled sources jar file...",
+                                "Publishing me/my-project@1..."
+                            ),
+                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+
                         test.assertEqual(0, console.getExitCode());
                     }
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "Running tests...",
-                            "",
-                            "Creating sources jar file...",
-                            "Creating compiled sources jar file...",
-                            "Publishing me/my-project@1..."
-                        ),
-                        Strings.getLines(output.asCharacterReadStream().getText().await()));
-                    test.assertEqual("", error.asCharacterReadStream().getText().await());
                     test.assertEqual(
                         Iterable.create(
                             "Manifest file:",
@@ -727,59 +845,72 @@ public interface QubPublishTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
-                    final ProjectJSON dependentProjectJson = new ProjectJSON()
-                        .setPublisher("me")
-                        .setProject("other-project")
-                        .setVersion("10")
-                        .setJava(new ProjectJSONJava()
-                            .setDependencies(Iterable.create(
-                                new Dependency()
-                                    .setPublisher("me")
-                                    .setProject("my-project")
-                                    .setVersion("1")
-                            )));
-                    fileSystem.setFileContentAsString("/qub/me/other-project/10/project.json", JSON.object(dependentProjectJson::write).toString()).await();
-                    final ProjectJSON nonDependentProjectJson = new ProjectJSON()
-                        .setPublisher("me")
-                        .setProject("my-other-project")
-                        .setVersion("5")
-                        .setJava(new ProjectJSONJava()
-                            .setDependencies(Iterable.create()));
-                    fileSystem.setFileContentAsString("/qub/me/my-other-project/5/project.json", JSON.object(nonDependentProjectJson::write).toString()).await();
+                    fileSystem.setFileContentAsString("/qub/me/other-project/10/project.json",
+                        new ProjectJSON()
+                            .setPublisher("me")
+                            .setProject("other-project")
+                            .setVersion("10")
+                            .setJava(new ProjectJSONJava()
+                                .setDependencies(Iterable.create(
+                                    new Dependency()
+                                        .setPublisher("me")
+                                        .setProject("my-project")
+                                        .setVersion("1"))))
+                            .toString()).await();
+                    fileSystem.setFileContentAsString("/qub/me/my-other-project/5/project.json",
+                        new ProjectJSON()
+                            .setPublisher("me")
+                            .setProject("my-other-project")
+                            .setVersion("5")
+                            .setJava(new ProjectJSONJava()
+                                .setDependencies(Iterable.create()))
+                            .toString()).await();
                     fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
-                    final ProjectJSON projectJSON = new ProjectJSON()
-                        .setProject("my-project")
-                        .setPublisher("me")
-                        .setVersion("2")
-                        .setJava(new ProjectJSONJava());
-                    fileSystem.setFileContentAsString(
-                        "/project.json",
-                        JSON.object(projectJSON::write).toString()).await();
+                    fileSystem.setFileContentAsString("/project.json",
+                        new ProjectJSON()
+                            .setProject("my-project")
+                            .setPublisher("me")
+                            .setVersion("2")
+                            .setJava(new ProjectJSONJava())
+                            .toString()).await();
                     try (final Console console = new Console())
                     {
                         console.setOutputByteWriteStream(output);
                         console.setErrorByteWriteStream(error);
                         console.setFileSystem(fileSystem);
                         console.setCurrentFolderPath(Path.parse("/"));
-                        console.setEnvironmentVariables(Map.<String,String>create()
+                        console.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
 
+                        final Folder currentFolder = console.getCurrentFolder().await();
+                        console.setProcessFactory(new FakeProcessFactory(console.getParallelAsyncRunner(), currentFolder)
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(currentFolder.getFolder("outputs").await())
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath("/outputs")
+                                .addSourceFile("sources/MyProject.java")
+                                .setFunctionAutomatically()));
+
                         main(console);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "Compiling 1 file...",
+                                "Running tests...",
+                                "",
+                                "Creating sources jar file...",
+                                "Creating compiled sources jar file...",
+                                "Publishing me/my-project@2...",
+                                "The following projects should be updated to use me/my-project@2:",
+                                "  me/other-project@10"
+                            ),
+                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+
                         test.assertEqual(0, console.getExitCode());
                     }
-                    test.assertEqual(
-                        Iterable.create(
-                            "Compiling...",
-                            "Running tests...",
-                            "",
-                            "Creating sources jar file...",
-                            "Creating compiled sources jar file...",
-                            "Publishing me/my-project@2...",
-                            "The following projects should be updated to use me/my-project@2:",
-                            "  me/other-project@10"
-                        ),
-                        Strings.getLines(output.asCharacterReadStream().getText().await()));
-                    test.assertEqual("", error.asCharacterReadStream().getText().await());
                     test.assertEqual(
                         Iterable.create(
                             "Files:",
@@ -793,7 +924,12 @@ public interface QubPublishTests
                             ""),
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/2/my-project.sources.jar").await()));
                     test.assertEqual(
-                        "{\"publisher\":\"me\",\"project\":\"my-project\",\"version\":\"2\",\"java\":{}}",
+                        new ProjectJSON()
+                            .setPublisher("me")
+                            .setProject("my-project")
+                            .setVersion("2")
+                            .setJava(new ProjectJSONJava())
+                        .toString(),
                         fileSystem.getFileContentAsString("/qub/me/my-project/2/project.json").await());
                     test.assertFalse(fileSystem.fileExists("/qub/my-project.cmd").await());
                 });
@@ -803,12 +939,8 @@ public interface QubPublishTests
 
     static void main(Console console)
     {
-        final QubBuild qubBuild = new QubBuild();
-        qubBuild.setJavaCompiler(new FakeJavaCompiler());
-
         final QubTest qubTest = new QubTest();
         qubTest.setJavaRunner(new FakeJavaRunner());
-        qubTest.setQubBuild(qubBuild);
 
         final QubPack qubPack = new QubPack();
         qubPack.setJarCreator(new FakeJarCreator());
