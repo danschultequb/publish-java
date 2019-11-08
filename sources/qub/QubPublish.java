@@ -98,8 +98,7 @@ public class QubPublish
                 else
                 {
                     final QubPack qubPack = getQubPack();
-                    qubPack.setShowTotalDuration(false);
-                    qubPack.main(console);
+                    console.setExitCode(qubPack.run(QubPack.getParameters(console)));
 
                     if (console.getExitCode() == 0)
                     {

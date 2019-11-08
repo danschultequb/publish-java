@@ -160,15 +160,20 @@ public interface QubPublishTests
                                 .addXlintDeprecation()
                                 .addClasspath("/outputs")
                                 .addSourceFile("sources/MyProject.java")
-                                .setFunctionAutomatically()));
-
-                        final QubTest qubTest = new QubTest();
-                        final FakeJavaRunner javaRunner = new FakeJavaRunner();
-                        javaRunner.setExitCode(1);
-                        qubTest.setJavaRunner(javaRunner);
+                                .setFunctionAutomatically())
+                            .add(new FakeConsoleTestRunnerProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addClasspath("/outputs")
+                                .addConsoleTestRunnerFullClassName()
+                                .addProfiler(false)
+                                .addVerbose(false)
+                                .addTestJson(true)
+                                .addOutputFolder("/outputs")
+                                .addCoverage(Coverage.None)
+                                .addFullClassNamesToTest(Iterable.create("MyProject"))
+                                .setFunction(1)));
 
                         final QubPack qubPack = new QubPack();
-                        qubPack.setQubTest(qubTest);
                         qubPack.setJarCreator(new FakeJarCreator());
 
                         main(console, qubPack);
@@ -220,7 +225,17 @@ public interface QubPublishTests
                                 .addXlintDeprecation()
                                 .addClasspath("/outputs")
                                 .addSourceFile("sources/MyProject.java")
-                                .setFunctionAutomatically()));
+                                .setFunctionAutomatically())
+                            .add(new FakeConsoleTestRunnerProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addClasspath("/outputs")
+                                .addConsoleTestRunnerFullClassName()
+                                .addProfiler(false)
+                                .addVerbose(false)
+                                .addTestJson(true)
+                                .addOutputFolder("/outputs")
+                                .addCoverage(Coverage.None)
+                                .addFullClassNamesToTest(Iterable.create("MyProject"))));
 
                         main(console);
 
@@ -278,7 +293,17 @@ public interface QubPublishTests
                                 .addXlintDeprecation()
                                 .addClasspath("/outputs")
                                 .addSourceFile("sources/MyProject.java")
-                                .setFunctionAutomatically()));
+                                .setFunctionAutomatically())
+                            .add(new FakeConsoleTestRunnerProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addClasspath("/outputs")
+                                .addConsoleTestRunnerFullClassName()
+                                .addProfiler(false)
+                                .addVerbose(false)
+                                .addTestJson(true)
+                                .addOutputFolder("/outputs")
+                                .addCoverage(Coverage.None)
+                                .addFullClassNamesToTest(Iterable.create("MyProject"))));
 
                         main(console);
 
@@ -349,7 +374,17 @@ public interface QubPublishTests
                                 .addXlintDeprecation()
                                 .addClasspath("/outputs")
                                 .addSourceFile("sources/MyProject.java")
-                                .setFunctionAutomatically()));
+                                .setFunctionAutomatically())
+                            .add(new FakeConsoleTestRunnerProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addClasspath("/outputs")
+                                .addConsoleTestRunnerFullClassName()
+                                .addProfiler(false)
+                                .addVerbose(false)
+                                .addTestJson(true)
+                                .addOutputFolder("/outputs")
+                                .addCoverage(Coverage.None)
+                                .addFullClassNamesToTest(Iterable.create("MyProject"))));
 
                         main(console);
 
@@ -428,7 +463,17 @@ public interface QubPublishTests
                                 .addXlintDeprecation()
                                 .addClasspath("/outputs")
                                 .addSourceFile("sources/MyProject.java")
-                                .setFunctionAutomatically()));
+                                .setFunctionAutomatically())
+                            .add(new FakeConsoleTestRunnerProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addClasspath("/outputs")
+                                .addConsoleTestRunnerFullClassName()
+                                .addProfiler(false)
+                                .addVerbose(false)
+                                .addTestJson(true)
+                                .addOutputFolder("/outputs")
+                                .addCoverage(Coverage.None)
+                                .addFullClassNamesToTest(Iterable.create("MyProject"))));
 
                         main(console);
 
@@ -521,7 +566,17 @@ public interface QubPublishTests
                                     "/qub/me/my-other-project/5/my-other-project.jar",
                                     "/qub/you/stuff/7.3.1/stuff.jar"))
                                 .addSourceFile("sources/MyProject.java")
-                                .setFunctionAutomatically()));
+                                .setFunctionAutomatically())
+                            .add(new FakeConsoleTestRunnerProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addClasspath("/outputs;/qub/me/my-other-project/5/my-other-project.jar;/qub/you/stuff/7.3.1/stuff.jar")
+                                .addConsoleTestRunnerFullClassName()
+                                .addProfiler(false)
+                                .addVerbose(false)
+                                .addTestJson(true)
+                                .addOutputFolder("/outputs")
+                                .addCoverage(Coverage.None)
+                                .addFullClassNamesToTest(Iterable.create("MyProject"))));
 
                         main(console);
 
@@ -614,7 +669,17 @@ public interface QubPublishTests
                                     "/qub/me/my-other-project/5/my-other-project.jar",
                                     "/qub/you/stuff/7.3.1/stuff.jar"))
                                 .addSourceFile("sources/MyProject.java")
-                                .setFunctionAutomatically()));
+                                .setFunctionAutomatically())
+                            .add(new FakeConsoleTestRunnerProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addClasspath("/outputs;/qub/me/my-other-project/5/my-other-project.jar;/qub/you/stuff/7.3.1/stuff.jar")
+                                .addConsoleTestRunnerFullClassName()
+                                .addProfiler(false)
+                                .addVerbose(false)
+                                .addTestJson(true)
+                                .addOutputFolder("/outputs")
+                                .addCoverage(Coverage.None)
+                                .addFullClassNamesToTest(Iterable.create("MyProject"))));
 
                         main(console);
 
@@ -715,7 +780,17 @@ public interface QubPublishTests
                                 .addXlintDeprecation()
                                 .addClasspath(Iterable.create("/outputs", "/qub/me/b/5/b.jar", "/qub/me/c/7/c.jar"))
                                 .addSourceFile("sources/MyProject.java")
-                                .setFunctionAutomatically()));
+                                .setFunctionAutomatically())
+                            .add(new FakeConsoleTestRunnerProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addClasspath("/outputs;/qub/me/b/5/b.jar;/qub/me/c/7/c.jar")
+                                .addConsoleTestRunnerFullClassName()
+                                .addProfiler(false)
+                                .addVerbose(false)
+                                .addTestJson(true)
+                                .addOutputFolder("/outputs")
+                                .addCoverage(Coverage.None)
+                                .addFullClassNamesToTest(Iterable.create("MyProject"))));
 
                         main(console);
 
@@ -794,7 +869,17 @@ public interface QubPublishTests
                                 .addXlintDeprecation()
                                 .addClasspath("/outputs")
                                 .addSourceFile("sources/MyProject.java")
-                                .setFunctionAutomatically()));
+                                .setFunctionAutomatically())
+                            .add(new FakeConsoleTestRunnerProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addClasspath("/outputs")
+                                .addConsoleTestRunnerFullClassName()
+                                .addProfiler(false)
+                                .addVerbose(false)
+                                .addTestJson(true)
+                                .addOutputFolder("/outputs")
+                                .addCoverage(Coverage.None)
+                                .addFullClassNamesToTest(Iterable.create("MyProject"))));
 
                         main(console);
 
@@ -891,7 +976,17 @@ public interface QubPublishTests
                                 .addXlintDeprecation()
                                 .addClasspath("/outputs")
                                 .addSourceFile("sources/MyProject.java")
-                                .setFunctionAutomatically()));
+                                .setFunctionAutomatically())
+                        .add(new FakeConsoleTestRunnerProcessRun()
+                            .setWorkingFolder(currentFolder)
+                            .addClasspath("/outputs")
+                            .addConsoleTestRunnerFullClassName()
+                            .addProfiler(false)
+                            .addVerbose(false)
+                            .addTestJson(true)
+                            .addOutputFolder("/outputs")
+                            .addCoverage(Coverage.None)
+                            .addFullClassNamesToTest(Iterable.create("MyProject"))));
 
                         main(console);
 
@@ -939,12 +1034,8 @@ public interface QubPublishTests
 
     static void main(Console console)
     {
-        final QubTest qubTest = new QubTest();
-        qubTest.setJavaRunner(new FakeJavaRunner());
-
         final QubPack qubPack = new QubPack();
         qubPack.setJarCreator(new FakeJarCreator());
-        qubPack.setQubTest(qubTest);
 
         main(console, qubPack);
     }
