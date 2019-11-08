@@ -26,33 +26,6 @@ public interface QubPublishTests
                 });
             });
 
-            runner.testGroup("setShowTotalDuration(boolean)", () ->
-            {
-                runner.test("with false", (Test test) ->
-                {
-                    final QubPublish qubPublish = new QubPublish();
-                    test.assertSame(qubPublish, qubPublish.setShowTotalDuration(false));
-                    test.assertFalse(qubPublish.getShowTotalDuration());
-                });
-
-                runner.test("with true", (Test test) ->
-                {
-                    final QubPublish qubPublish = new QubPublish();
-                    test.assertSame(qubPublish, qubPublish.setShowTotalDuration(true));
-                    test.assertTrue(qubPublish.getShowTotalDuration());
-                });
-            });
-
-            runner.testGroup("getShowTotalDuration()", () ->
-            {
-                runner.test("when no value has been set", (Test test) ->
-                {
-                    final QubPublish qubPublish = new QubPublish();
-                    test.assertTrue(qubPublish.getShowTotalDuration());
-                    test.assertTrue(qubPublish.getShowTotalDuration());
-                });
-            });
-
             runner.testGroup("main(String[])", () ->
             {
                 runner.test("with null", (Test test) ->
@@ -84,9 +57,15 @@ public interface QubPublishTests
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Usage: qub-publish [[--folder=]<folder-to-publish>] [--profiler] [--help]",
+                            "Usage: qub-publish [[--folder=]<folder-to-publish>] [--jvm.classpath=<jvm.classpath-value>] [--testjson] [--coverage[=<None|Sources|Tests|All>]] [--buildjson] [--warnings=<show|error|hide>] [--verbose] [--profiler] [--help]",
                             "  Used to published packaged source and compiled code to the qub folder.",
                             "  --folder: The folder to publish. Defaults to the current folder.",
+                            "  --jvm.classpath: The classpath that was passed to the JVM when this application was started.",
+                            "  --testjson: Whether or not to write the test results to a test.json file.",
+                            "  --coverage(c): Whether or not to collect code coverage information while running tests.",
+                            "  --buildjson: Whether or not to read and write a build.json file. Defaults to true.",
+                            "  --warnings: How to handle build warnings. Can be either \"show\", \"error\", or \"hide\". Defaults to \"show\".",
+                            "  --verbose(v): Whether or not to show verbose logs.",
                             "  --profiler: Whether or not this application should pause before it is run to allow a profiler to be attached.",
                             "  --help(?): Show the help message for this application."),
                         Strings.getLines(output.asCharacterReadStream().getText().await()));
@@ -123,7 +102,7 @@ public interface QubPublishTests
                         Iterable.create(
                             "ERROR: Can't publish without a QUB_HOME environment variable."
                         ),
-                        Strings.getLines(output.asCharacterReadStream().getText().await()));
+                        Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
                     test.assertEqual("", error.asCharacterReadStream().getText().await());
                 });
 
@@ -184,7 +163,7 @@ public interface QubPublishTests
                                 "Running tests...",
                                 ""
                             ),
-                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
                         test.assertEqual("", error.asCharacterReadStream().getText().await());
                     
                         test.assertEqual(1, console.getExitCode());
@@ -248,7 +227,7 @@ public interface QubPublishTests
                                 "Creating compiled sources jar file...",
                                 "ERROR: This package (me/my-project:1) can't be published because a package with that signature already exists."
                             ),
-                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
                         test.assertEqual("", error.asCharacterReadStream().getText().await());
 
                         test.assertEqual(1, console.getExitCode());
@@ -316,7 +295,7 @@ public interface QubPublishTests
                                 "Creating compiled sources jar file...",
                                 "Publishing me/my-project@1..."
                             ),
-                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
                         test.assertEqual("", error.asCharacterReadStream().getText().await());
 
                         test.assertEqual(0, console.getExitCode());
@@ -397,7 +376,7 @@ public interface QubPublishTests
                                 "Creating compiled sources jar file...",
                                 "Publishing me/my-project@1..."
                             ),
-                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
                         test.assertEqual("", error.asCharacterReadStream().getText().await());
 
                         test.assertEqual(0, console.getExitCode());
@@ -486,7 +465,7 @@ public interface QubPublishTests
                                 "Creating compiled sources jar file...",
                                 "Publishing me/my-project@1..."
                             ),
-                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
                         test.assertEqual("", error.asCharacterReadStream().getText().await());
 
                         test.assertEqual(0, console.getExitCode());
@@ -589,7 +568,7 @@ public interface QubPublishTests
                                 "Creating compiled sources jar file...",
                                 "Publishing me/my-project@1..."
                             ),
-                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
                         test.assertEqual("", error.asCharacterReadStream().getText().await());
 
                         test.assertEqual(0, console.getExitCode());
@@ -692,7 +671,7 @@ public interface QubPublishTests
                                 "Creating compiled sources jar file...",
                                 "Publishing me/my-project@1..."
                             ),
-                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
                         test.assertEqual("", error.asCharacterReadStream().getText().await());
 
                         test.assertEqual(0, console.getExitCode());
@@ -803,7 +782,7 @@ public interface QubPublishTests
                                 "Creating compiled sources jar file...",
                                 "Publishing me/a@1..."
                             ),
-                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
                         test.assertEqual("", error.asCharacterReadStream().getText().await());
 
                         test.assertEqual(0, console.getExitCode());
@@ -892,7 +871,7 @@ public interface QubPublishTests
                                 "Creating compiled sources jar file...",
                                 "Publishing me/my-project@1..."
                             ),
-                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
                         test.assertEqual("", error.asCharacterReadStream().getText().await());
 
                         test.assertEqual(0, console.getExitCode());
@@ -1001,7 +980,7 @@ public interface QubPublishTests
                                 "The following projects should be updated to use me/my-project@2:",
                                 "  me/other-project@10"
                             ),
-                            Strings.getLines(output.asCharacterReadStream().getText().await()));
+                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
                         test.assertEqual("", error.asCharacterReadStream().getText().await());
 
                         test.assertEqual(0, console.getExitCode());
@@ -1044,7 +1023,6 @@ public interface QubPublishTests
     {
         final QubPublish qubPublish = new QubPublish();
         qubPublish.setQubPack(qubPack);
-        qubPublish.setShowTotalDuration(false);
 
         qubPublish.main(console);
     }
