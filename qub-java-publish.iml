@@ -46,11 +46,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/qub-java-pack/23/qub-java-pack.jar!/" />
+          <root url="jar://C:/qub/qub/qub-java-pack/25/qub-java-pack.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://C:/qub/qub/qub-java-pack/23/qub-java-pack.sources.jar!/" />
+          <root url="jar://C:/qub/qub/qub-java-pack/25/qub-java-pack.sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

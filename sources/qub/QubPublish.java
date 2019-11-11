@@ -1,13 +1,13 @@
 package qub;
 
-public class QubPublish
+public interface QubPublish
 {
-    public static void main(String[] args)
+    static void main(String[] args)
     {
-        Console.run(args, (Console console) -> new QubPublish().main(console));
+        Console.run(args, (Console console) -> QubPublish.main(console));
     }
 
-    public static CommandLineParameter<Folder> addFolderToPublishParameter(CommandLineParameters parameters, Process process)
+    static CommandLineParameter<Folder> addFolderToPublishParameter(CommandLineParameters parameters, Process process)
     {
         PreCondition.assertNotNull(parameters, "parameters");
         PreCondition.assertNotNull(process, "process");
@@ -17,7 +17,7 @@ public class QubPublish
             .setDescription("The folder to publish. Defaults to the current folder.");
     }
 
-    public static QubPublishParameters getParameters(Process process)
+    static QubPublishParameters getParameters(Process process)
     {
         PreCondition.assertNotNull(process, "process");
 
@@ -60,38 +60,7 @@ public class QubPublish
         return result;
     }
 
-    private QubPack qubPack;
-
-    /**
-     * Set the QubPack object that will be used to package the source code.
-     * @param qubPack The QubPack object that will be used to package the source code.
-     * @return This object for method chaining.
-     */
-    public QubPublish setQubPack(QubPack qubPack)
-    {
-        this.qubPack = qubPack;
-        return this;
-    }
-
-    /**
-     * Get the QubPack object that will be used to package the source code. If no QubPack object has
-     * been set, a default one will be created and returned.
-     * @return The QubPack object that will be used to test the source code.
-     */
-    public QubPack getQubPack()
-    {
-        if (qubPack == null)
-        {
-            qubPack = new QubPack();
-        }
-        final QubPack result = qubPack;
-
-        PostCondition.assertNotNull(result, "result");
-
-        return result;
-    }
-
-    public void main(Console console)
+    static void main(Console console)
     {
         PreCondition.assertNotNull(console, "console");
 
@@ -102,7 +71,7 @@ public class QubPublish
             stopwatch.start();
             try
             {
-                console.setExitCode(this.run(parameters));
+                console.setExitCode(QubPublish.run(parameters));
             }
             finally
             {
@@ -112,7 +81,7 @@ public class QubPublish
         }
     }
 
-    public int run(QubPublishParameters parameters)
+    static int run(QubPublishParameters parameters)
     {
         PreCondition.assertNotNull(parameters, "parameters");
 
@@ -127,8 +96,7 @@ public class QubPublish
                 .convertError(NotFoundException.class, () -> new NotFoundException("Can't publish without a QUB_HOME environment variable."))
                 .await();
 
-            final QubPack qubPack = getQubPack();
-            exitCode = qubPack.run(parameters);
+            exitCode = QubPack.run(parameters);
             if (exitCode == 0)
             {
                 final Folder outputFolder = folderToPublish.getFolder("outputs").await();
@@ -284,14 +252,14 @@ public class QubPublish
         return exitCode;
     }
 
-    private static Comparison compareVersionFolders(Folder lhs, Folder rhs)
+    static Comparison compareVersionFolders(Folder lhs, Folder rhs)
     {
         final Integer lhsValue = Integers.parse(lhs.getName()).catchError().await();
         final Integer rhsValue = Integers.parse(rhs.getName()).catchError().await();
         return Comparer.compare(lhsValue, rhsValue);
     }
 
-    private static Result<Folder> getLatestVersionFolder(Folder qubFolder, String publisher, String project)
+    static Result<Folder> getLatestVersionFolder(Folder qubFolder, String publisher, String project)
     {
         PreCondition.assertNotNull(qubFolder, "qubFolder");
         PreCondition.assertNotNullAndNotEmpty(publisher, "publisher");
@@ -312,7 +280,7 @@ public class QubPublish
         });
     }
 
-    private static Result<String> getLatestVersion(Folder qubFolder, String publisher, String project)
+    static Result<String> getLatestVersion(Folder qubFolder, String publisher, String project)
     {
         return getLatestVersionFolder(qubFolder, publisher, project)
             .then(Folder::getName);
