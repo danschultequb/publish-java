@@ -25,7 +25,6 @@ public interface QubPublish
             .setApplicationName("qub-publish")
             .setApplicationDescription("Used to published packaged source and compiled code to the qub folder.");
         final CommandLineParameter<Folder> folderToPublishParameter = QubPublish.addFolderToPublishParameter(parameters, process);
-        final CommandLineParameter<String> jvmClassPathParameter = QubTest.addJvmClassPathParameter(parameters);
         final CommandLineParameterBoolean testJsonParameter = QubTest.addTestJsonParameter(parameters);
         final CommandLineParameter<Coverage> coverageParameter = QubTest.addCoverageParameter(parameters);
         final CommandLineParameterBoolean buildJsonParameter = QubBuild.addBuildJsonParameter(parameters);
@@ -46,9 +45,9 @@ public interface QubPublish
             final EnvironmentVariables environmentVariables = process.getEnvironmentVariables();
             final ProcessFactory processFactory = process.getProcessFactory();
             final DefaultApplicationLauncher defaultApplicationLauncher = process.getDefaultApplicationLauncher();
+            final String jvmClassPath = process.getJVMClasspath().await();
 
-            result = new QubPublishParameters(output, error, folderToPublish, environmentVariables, processFactory, defaultApplicationLauncher)
-                .setJvmClassPath(jvmClassPathParameter.removeValue().await())
+            result = new QubPublishParameters(output, error, folderToPublish, environmentVariables, processFactory, defaultApplicationLauncher, jvmClassPath)
                 .setTestJson(testJsonParameter.removeValue().await())
                 .setCoverage(coverageParameter.removeValue().await())
                 .setBuildJson(buildJsonParameter.removeValue().await())
@@ -175,17 +174,12 @@ public interface QubPublish
                             }
                         }
 
-                        String capturedJVMClasspath = "";
-                        if (Booleans.isTrue(projectJsonJava.getCaptureVMArguments()))
-                        {
-                            capturedJVMClasspath = " --jvm.classpath=" + classpath;
-                        }
-
                         final File shortcutFile = qubFolder.getFile(shortcutName + ".cmd").await();
-                        final String shortcutFileContents =
-                            "@echo OFF\n" +
-                                "java -classpath " + classpath + " " + mainClass + capturedJVMClasspath + " %*\n";
-                        shortcutFile.setContentsAsString(shortcutFileContents).await();
+                        try (final CharacterWriteStream shortcutFileStream = shortcutFile.getContentCharacterWriteStream().await())
+                        {
+                            shortcutFileStream.writeLine("@echo OFF").await();
+                            shortcutFileStream.writeLine("java -classpath " + classpath + " " + mainClass + " %*").await();
+                        }
                     }
                 }
 

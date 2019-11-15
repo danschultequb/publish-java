@@ -13,44 +13,44 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/qub-java/123/qub-java.jar!/" />
+          <root url="jar://C:/qub/qub/qub-java/126/qub-java.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://C:/qub/qub/qub-java/123/qub-java.sources.jar!/" />
+          <root url="jar://C:/qub/qub/qub-java/126/qub-java.sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/qub-java-build/34/qub-java-build.jar!/" />
+          <root url="jar://C:/qub/qub/qub-java-build/38/qub-java-build.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://C:/qub/qub/qub-java-build/34/qub-java-build.sources.jar!/" />
+          <root url="jar://C:/qub/qub/qub-java-build/38/qub-java-build.sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/qub-java-test/25/qub-java-test.jar!/" />
+          <root url="jar://C:/qub/qub/qub-java-test/27/qub-java-test.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://C:/qub/qub/qub-java-test/25/qub-java-test.sources.jar!/" />
+          <root url="jar://C:/qub/qub/qub-java-test/27/qub-java-test.sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/qub-java-pack/25/qub-java-pack.jar!/" />
+          <root url="jar://C:/qub/qub/qub-java-pack/27/qub-java-pack.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://C:/qub/qub/qub-java-pack/25/qub-java-pack.sources.jar!/" />
+          <root url="jar://C:/qub/qub/qub-java-pack/27/qub-java-pack.sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
