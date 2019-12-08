@@ -25,6 +25,7 @@ public interface QubPublish
             .setApplicationName("qub-publish")
             .setApplicationDescription("Used to published packaged source and compiled code to the qub folder.");
         final CommandLineParameter<Folder> folderToPublishParameter = QubPublish.addFolderToPublishParameter(parameters, process);
+        final CommandLineParameterBoolean packJsonParameter = QubPack.addPackJsonParameter(parameters);
         final CommandLineParameterBoolean testJsonParameter = QubTest.addTestJsonParameter(parameters);
         final CommandLineParameter<Coverage> coverageParameter = QubTest.addCoverageParameter(parameters);
         final CommandLineParameterBoolean buildJsonParameter = QubBuild.addBuildJsonParameter(parameters);
@@ -48,6 +49,7 @@ public interface QubPublish
             final String jvmClassPath = process.getJVMClasspath().await();
 
             result = new QubPublishParameters(output, error, folderToPublish, environmentVariables, processFactory, defaultApplicationLauncher, jvmClassPath)
+                .setPackJson(packJsonParameter.removeValue().await())
                 .setTestJson(testJsonParameter.removeValue().await())
                 .setCoverage(coverageParameter.removeValue().await())
                 .setBuildJson(buildJsonParameter.removeValue().await())

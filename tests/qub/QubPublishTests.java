@@ -38,9 +38,10 @@ public interface QubPublishTests
                     }
                     test.assertEqual(
                         Iterable.create(
-                            "Usage: qub-publish [[--folder=]<folder-to-publish>] [--testjson] [--coverage[=<None|Sources|Tests|All>]] [--buildjson] [--warnings=<show|error|hide>] [--verbose] [--profiler] [--help]",
+                            "Usage: qub-publish [[--folder=]<folder-to-publish>] [--packjson] [--testjson] [--coverage[=<None|Sources|Tests|All>]] [--buildjson] [--warnings=<show|error|hide>] [--verbose] [--profiler] [--help]",
                             "  Used to published packaged source and compiled code to the qub folder.",
                             "  --folder: The folder to publish. Defaults to the current folder.",
+                            "  --packjson: Whether or not to read and write a pack.json file. Defaults to true.",
                             "  --testjson: Whether or not to write the test results to a test.json file.",
                             "  --coverage(c): Whether or not to collect code coverage information while running tests.",
                             "  --buildjson: Whether or not to read and write a build.json file. Defaults to true.",

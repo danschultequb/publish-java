@@ -23,6 +23,12 @@ public class QubPublishParameters extends QubPackParameters
     }
 
     @Override
+    public QubPublishParameters setPackJson(boolean packJson)
+    {
+        return (QubPublishParameters)super.setPackJson(packJson);
+    }
+
+    @Override
     public QubPublishParameters setPattern(String pattern)
     {
         return (QubPublishParameters)super.setPattern(pattern);
