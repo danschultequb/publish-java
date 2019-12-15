@@ -448,14 +448,8 @@ public interface QubPublishTests
                     projectJSON.setJava(new ProjectJSONJava()
                         .setMainClass("MyProject")
                         .setDependencies(Iterable.create(
-                            new Dependency()
-                                .setPublisher("me")
-                                .setProject("my-other-project")
-                                .setVersion("5"),
-                            new Dependency()
-                                .setPublisher("you")
-                                .setProject("stuff")
-                                .setVersion("7.3.1"))));
+                            new ProjectSignature("me", "my-other-project", "5"),
+                            new ProjectSignature("you", "stuff", "7.3.1"))));
                     fileSystem.setFileContentAsString(
                         "/project.json",
                         JSON.object(projectJSON::write).toString()).await();
@@ -545,14 +539,8 @@ public interface QubPublishTests
                             .setJava(new ProjectJSONJava()
                                 .setMainClass("MyProject")
                                 .setDependencies(Iterable.create(
-                                    new Dependency()
-                                        .setPublisher("me")
-                                        .setProject("my-other-project")
-                                        .setVersion("5"),
-                                    new Dependency()
-                                        .setPublisher("you")
-                                        .setProject("stuff")
-                                        .setVersion("7.3.1"))))
+                                    new ProjectSignature("me", "my-other-project", "5"),
+                                    new ProjectSignature("you", "stuff", "7.3.1"))))
                             .toString(),
                         fileSystem.getFileContentAsString("/qub/me/my-project/1/project.json").await());
                     test.assertEqual(
@@ -577,20 +565,14 @@ public interface QubPublishTests
                         .setJava(new ProjectJSONJava()
                             .setMainClass("MyProject")
                             .setDependencies(Iterable.create(
-                                new Dependency()
-                                    .setPublisher("me")
-                                    .setProject("b")
-                                    .setVersion("5"))));
+                                new ProjectSignature("me", "b", "5"))));
                     final ProjectJSON bProjectJSON = new ProjectJSON()
                         .setProject("b")
                         .setPublisher("me")
                         .setVersion("5")
                         .setJava(new ProjectJSONJava()
                             .setDependencies(Iterable.create(
-                                new Dependency()
-                                    .setPublisher("me")
-                                    .setProject("c")
-                                    .setVersion("7"))));
+                                new ProjectSignature("me", "c", "7"))));
                     final ProjectJSON cProjectJSON = new ProjectJSON()
                         .setProject("c")
                         .setPublisher("me")
@@ -683,10 +665,7 @@ public interface QubPublishTests
                             .setJava(new ProjectJSONJava()
                                 .setMainClass("MyProject")
                                 .setDependencies(Iterable.create(
-                                    new Dependency()
-                                    .setPublisher("me")
-                                    .setProject("b")
-                                    .setVersion("5"))))
+                                    new ProjectSignature("me", "b", "5"))))
                             .toString(),
                         fileSystem.getFileContentAsString("/qub/me/a/1/project.json").await());
                     test.assertEqual(
@@ -819,10 +798,7 @@ public interface QubPublishTests
                             .setVersion("10")
                             .setJava(new ProjectJSONJava()
                                 .setDependencies(Iterable.create(
-                                    new Dependency()
-                                        .setPublisher("me")
-                                        .setProject("my-project")
-                                        .setVersion("1"))))
+                                    new ProjectSignature("me", "my-project", "1"))))
                             .toString()).await();
                     fileSystem.setFileContentAsString("/qub/me/my-other-project/5/project.json",
                         new ProjectJSON()

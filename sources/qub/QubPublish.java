@@ -164,10 +164,10 @@ public interface QubPublish
                         }
 
                         String classpath = "%~dp0" + versionFolderCompiledSourcesJarFile.relativeTo(qubFolder);
-                        final Iterable<Dependency> dependencies = QubBuild.getAllDependencies(qubFolder, projectJsonJava.getDependencies()).getKeys();
+                        final Iterable<ProjectSignature> dependencies = QubBuild.getAllDependencies(qubFolder, projectJsonJava.getDependencies()).getKeys();
                         if (!Iterable.isNullOrEmpty(dependencies))
                         {
-                            for (final Dependency dependency : dependencies)
+                            for (final ProjectSignature dependency : dependencies)
                             {
                                 final File dependencyCompiledSourcesJarFile = qubFolder.getCompiledSourcesFile(
                                     dependency.getPublisher(),
@@ -207,15 +207,19 @@ public interface QubPublish
                                 final ProjectJSONJava publishedProjectJsonJava = publishedProjectJson.getJava();
                                 if (publishedProjectJsonJava != null)
                                 {
-                                    final Iterable<Dependency> dependencies = publishedProjectJsonJava.getDependencies();
+                                    final Iterable<ProjectSignature> dependencies = publishedProjectJsonJava.getDependencies();
                                     if (!Iterable.isNullOrEmpty(dependencies))
                                     {
-                                        final Dependency dependency = dependencies.first((Dependency d) ->
+                                        final ProjectSignature dependency = dependencies.first((ProjectSignature d) ->
                                             Comparer.equal(d.getPublisher(), publisher) &&
-                                                Comparer.equal(d.getProject(), project));
+                                            Comparer.equal(d.getProject(), project));
                                         if (dependency != null)
                                         {
-                                            projectsToUpdate.add(publishedProjectJson.getPublisher() + "/" + publishedProjectJson.getProject() + "@" + publishedProjectJson.getVersion());
+                                            final ProjectSignature publishedProjectSignature = new ProjectSignature(
+                                                publishedProjectJson.getPublisher(),
+                                                publishedProjectJson.getProject(),
+                                                publishedProjectJson.getVersion());
+                                            projectsToUpdate.add(publishedProjectSignature.toString());
                                         }
                                     }
                                 }
