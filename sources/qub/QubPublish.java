@@ -96,7 +96,7 @@ public interface QubPublish
                 final Folder outputFolder = folderToPublish.getFolder("outputs").await();
 
                 final File projectJsonFile = folderToPublish.getFile("project.json").await();
-                final ProjectJSON projectJSON = ProjectJSON.parse(projectJsonFile).await();
+                final ProjectJSON projectJSON = QubBuild.parseProjectJSONFile(projectJsonFile).await();
                 final String publisher = projectJSON.getPublisher();
                 final String project = projectJSON.getProject();
                 String version = projectJSON.getVersion();
@@ -192,7 +192,7 @@ public interface QubPublish
                         if (latestVersionFolder != null)
                         {
                             final File publishedProjectJsonFile = latestVersionFolder.getProjectJSONFile().await();
-                            final ProjectJSON publishedProjectJson = ProjectJSON.parse(publishedProjectJsonFile)
+                            final ProjectJSON publishedProjectJson = QubBuild.parseProjectJSONFile(publishedProjectJsonFile)
                                 .catchError(FileNotFoundException.class)
                                 .await();
                             if (publishedProjectJson != null)

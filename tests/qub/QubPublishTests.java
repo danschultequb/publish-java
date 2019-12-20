@@ -65,9 +65,7 @@ public interface QubPublishTests
                     projectJSON.setPublisher("me");
                     projectJSON.setVersion("1");
                     projectJSON.setJava(new ProjectJSONJava());
-                    fileSystem.setFileContentAsString(
-                        "/project.json",
-                        JSON.object(projectJSON::write).toString()).await();
+                    fileSystem.setFileContentAsString("/project.json", projectJSON.toString()).await();
                     try (final Process process = Process.create())
                     {
                         process.setOutputByteWriteStream(output);
@@ -102,7 +100,7 @@ public interface QubPublishTests
                     projectJSON.setJava(new ProjectJSONJava());
                     fileSystem.setFileContentAsString(
                         "/project.json",
-                        JSON.object(projectJSON::write).toString()).await();
+                        projectJSON.toString()).await();
                     try (final Process process = Process.create())
                     {
                         process.setOutputByteWriteStream(output);
@@ -165,7 +163,7 @@ public interface QubPublishTests
                     projectJSON.setJava(new ProjectJSONJava());
                     fileSystem.setFileContentAsString(
                         "/project.json",
-                        JSON.object(projectJSON::write).toString()).await();
+                        projectJSON.toString()).await();
                     try (final Process process = Process.create())
                     {
                         process.setOutputByteWriteStream(output);
@@ -246,7 +244,7 @@ public interface QubPublishTests
                     projectJSON.setJava(new ProjectJSONJava());
                     fileSystem.setFileContentAsString(
                         "/project.json",
-                        JSON.object(projectJSON::write).toString()).await();
+                        projectJSON.toString()).await();
                     try (final Process process = Process.create())
                     {
                         process.setOutputByteWriteStream(output);
@@ -343,7 +341,7 @@ public interface QubPublishTests
                             .setMainClass("MyProject"));
                     fileSystem.setFileContentAsString(
                         "/project.json",
-                        JSON.object(projectJSON::write).toString()).await();
+                        projectJSON.toString()).await();
                     try (final Process process = Process.create())
                     {
                         process.setOutputByteWriteStream(output);
@@ -452,7 +450,7 @@ public interface QubPublishTests
                             new ProjectSignature("you", "stuff", "7.3.1"))));
                     fileSystem.setFileContentAsString(
                         "/project.json",
-                        JSON.object(projectJSON::write).toString()).await();
+                        projectJSON.toString()).await();
                     fileSystem.setFileContentAsString("/qub/me/my-other-project/5/my-other-project.jar", "hello").await();
                     fileSystem.setFileContentAsString("/qub/you/stuff/7.3.1/stuff.jar", "hello2").await();
                     try (final Process process = Process.create())
@@ -577,13 +575,11 @@ public interface QubPublishTests
                         .setProject("c")
                         .setPublisher("me")
                         .setVersion("7");
-                    fileSystem.setFileContentAsString(
-                        "/project.json",
-                        JSON.object(aProjectJSON::write).toString()).await();
+                    fileSystem.setFileContentAsString("/project.json", aProjectJSON.toString()).await();
                     fileSystem.setFileContentAsString("/qub/me/b/5/b.jar", "hello").await();
-                    fileSystem.setFileContentAsString("/qub/me/b/5/project.json", JSON.object(bProjectJSON::write).toString()).await();
+                    fileSystem.setFileContentAsString("/qub/me/b/5/project.json", bProjectJSON.toString()).await();
                     fileSystem.setFileContentAsString("/qub/me/c/7/c.jar", "hello").await();
-                    fileSystem.setFileContentAsString("/qub/me/c/7/project.json", JSON.object(cProjectJSON::write).toString()).await();
+                    fileSystem.setFileContentAsString("/qub/me/c/7/project.json", cProjectJSON.toString()).await();
                     try (final Process process = Process.create())
                     {
                         process.setOutputByteWriteStream(output);
@@ -692,7 +688,7 @@ public interface QubPublishTests
                         .setShortcutName("foo"));
                     fileSystem.setFileContentAsString(
                         "/project.json",
-                        JSON.object(projectJSON::write).toString()).await();
+                        projectJSON.toString()).await();
                     try (final Process process = Process.create())
                     {
                         process.setOutputByteWriteStream(output);
