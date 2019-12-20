@@ -4,7 +4,7 @@ public interface QubPublish
 {
     static void main(String[] args)
     {
-        Console.run(args, (Console console) -> QubPublish.main(console));
+        Process.run(args, QubPublish::main);
     }
 
     static CommandLineParameter<Folder> addFolderToPublishParameter(CommandLineParameters parameters, Process process)
@@ -61,24 +61,17 @@ public interface QubPublish
         return result;
     }
 
-    static void main(Console console)
+    static void main(Process process)
     {
-        PreCondition.assertNotNull(console, "console");
+        PreCondition.assertNotNull(process, "process");
 
-        final QubPublishParameters parameters = QubPublish.getParameters(console);
+        final QubPublishParameters parameters = QubPublish.getParameters(process);
         if (parameters != null)
         {
-            final Stopwatch stopwatch = console.getStopwatch();
-            stopwatch.start();
-            try
+            process.showDuration(() ->
             {
-                console.setExitCode(QubPublish.run(parameters));
-            }
-            finally
-            {
-                final Duration compilationDuration = stopwatch.stop().toSeconds();
-                console.writeLine("Done (" + compilationDuration.toString("0.0") + ")").await();
-            }
+                process.setExitCode(QubPublish.run(parameters));
+            });
         }
     }
 
