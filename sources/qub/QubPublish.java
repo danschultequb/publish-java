@@ -4,7 +4,7 @@ public interface QubPublish
 {
     static void main(String[] args)
     {
-        Process.run(args, QubPublish::main);
+        Process.run(args, (Action1<Process>)QubPublish::main);
     }
 
     static CommandLineParameter<Folder> addFolderToPublishParameter(CommandLineParameters parameters, Process process)
