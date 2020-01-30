@@ -96,11 +96,11 @@ public interface QubPublish
                 final Folder outputFolder = folderToPublish.getFolder("outputs").await();
 
                 final File projectJsonFile = folderToPublish.getFile("project.json").await();
-                final ProjectJSON projectJSON = QubBuild.parseProjectJSONFile(projectJsonFile).await();
+                final ProjectJSON projectJSON = ProjectJSON.parse(projectJsonFile).await();
                 final String publisher = projectJSON.getPublisher();
                 final String project = projectJSON.getProject();
                 String version = projectJSON.getVersion();
-                final QubFolder qubFolder = new QubFolder(folderToPublish.getFileSystem().getFolder(qubHome).await());
+                final QubFolder qubFolder = QubFolder.create(folderToPublish.getFileSystem().getFolder(qubHome).await());
 
                 if (Strings.isNullOrEmpty(version))
                 {
@@ -157,9 +157,11 @@ public interface QubPublish
                         }
 
                         String classpath = "%~dp0" + versionFolderCompiledSourcesJarFile.relativeTo(qubFolder);
-                        final Iterable<ProjectSignature> dependencies = QubBuild.getAllDependencies(qubFolder, projectJsonJava.getDependencies()).getKeys();
+                        Iterable<ProjectSignature> dependencies = projectJsonJava.getDependencies();
                         if (!Iterable.isNullOrEmpty(dependencies))
                         {
+                            dependencies = projectJsonJava.getTransitiveDependencies(qubFolder);
+
                             for (final ProjectSignature dependency : dependencies)
                             {
                                 final File dependencyCompiledSourcesJarFile = qubFolder.getCompiledSourcesFile(
@@ -192,7 +194,7 @@ public interface QubPublish
                         if (latestVersionFolder != null)
                         {
                             final File publishedProjectJsonFile = latestVersionFolder.getProjectJSONFile().await();
-                            final ProjectJSON publishedProjectJson = QubBuild.parseProjectJSONFile(publishedProjectJsonFile)
+                            final ProjectJSON publishedProjectJson = ProjectJSON.parse(publishedProjectJsonFile)
                                 .catchError(FileNotFoundException.class)
                                 .await();
                             if (publishedProjectJson != null)

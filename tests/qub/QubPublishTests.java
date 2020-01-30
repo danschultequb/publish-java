@@ -478,7 +478,7 @@ public interface QubPublishTests
                                 .setFunctionAutomatically())
                             .add(new FakeConsoleTestRunnerProcessRun()
                                 .setWorkingFolder(currentFolder)
-                                .addClasspath("/outputs;/qub/me/my-other-project/5/my-other-project.jar;/qub/you/stuff/7.3.1/stuff.jar")
+                                .addClasspath("/outputs;/qub/you/stuff/7.3.1/stuff.jar;/qub/me/my-other-project/5/my-other-project.jar")
                                 .addConsoleTestRunnerFullClassName()
                                 .addProfiler(false)
                                 .addVerbose(false)
@@ -544,7 +544,7 @@ public interface QubPublishTests
                     test.assertEqual(
                         Iterable.create(
                             "@echo OFF",
-                            "java -classpath %~dp0me/my-project/1/my-project.jar;%~dp0me/my-other-project/5/my-other-project.jar;%~dp0you/stuff/7.3.1/stuff.jar MyProject %*"),
+                            "java -classpath %~dp0me/my-project/1/my-project.jar;%~dp0you/stuff/7.3.1/stuff.jar;%~dp0me/my-other-project/5/my-other-project.jar MyProject %*"),
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/my-project.cmd").await()));
                 });
 
