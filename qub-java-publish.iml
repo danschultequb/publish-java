@@ -13,66 +13,88 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/json-java/10/json-java.jar!/"/>
+          <root url="jar://C:/qub/qub/json-java/11/json-java.jar!/"/>
         </CLASSES>
         <JAVADOC/>
         <SOURCES>
-          <root url="jar://C:/qub/qub/json-java/10/json-java.sources.jar!/"/>
+          <root url="jar://C:/qub/qub/json-java/11/json-java.sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/projectjson-java/12/projectjson-java.jar!/"/>
+          <root url="jar://C:/qub/qub/projectjson-java/13/projectjson-java.jar!/"/>
         </CLASSES>
         <JAVADOC/>
         <SOURCES>
-          <root url="jar://C:/qub/qub/projectjson-java/12/projectjson-java.sources.jar!/"/>
+          <root url="jar://C:/qub/qub/projectjson-java/13/projectjson-java.sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/qub-java-build/66/qub-java-build.jar!/"/>
+          <root url="jar://C:/qub/qub/qub-java-build/67/qub-java-build.jar!/"/>
         </CLASSES>
         <JAVADOC/>
         <SOURCES>
-          <root url="jar://C:/qub/qub/qub-java-build/66/qub-java-build.sources.jar!/"/>
+          <root url="jar://C:/qub/qub/qub-java-build/67/qub-java-build.sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/qub-java-test/50/qub-java-test.jar!/"/>
+          <root url="jar://C:/qub/qub/qub-java-test/51/qub-java-test.jar!/"/>
         </CLASSES>
         <JAVADOC/>
         <SOURCES>
-          <root url="jar://C:/qub/qub/qub-java-test/50/qub-java-test.sources.jar!/"/>
+          <root url="jar://C:/qub/qub/qub-java-test/51/qub-java-test.sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/qub-java-pack/49/qub-java-pack.jar!/"/>
+          <root url="jar://C:/qub/qub/qub-java-pack/50/qub-java-pack.jar!/"/>
         </CLASSES>
         <JAVADOC/>
         <SOURCES>
-          <root url="jar://C:/qub/qub/qub-java-pack/49/qub-java-pack.sources.jar!/"/>
+          <root url="jar://C:/qub/qub/qub-java-pack/50/qub-java-pack.sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/lib-java/2/lib-java.jar!/"/>
+          <root url="jar://C:/qub/qub/lib-java/4/lib-java.jar!/"/>
         </CLASSES>
         <JAVADOC/>
         <SOURCES>
-          <root url="jar://C:/qub/qub/lib-java/2/lib-java.sources.jar!/"/>
+          <root url="jar://C:/qub/qub/lib-java/4/lib-java.sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/qub/qub/jacococli-java/1/jacococli-java.jar!/"/>
+        </CLASSES>
+        <JAVADOC/>
+        <SOURCES>
+          <root url="jar://C:/qub/qub/jacococli-java/1/jacococli-java.sources.jar!/"/>
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://C:/qub/qub/javacli-java/1/javacli-java.jar!/"/>
+        </CLASSES>
+        <JAVADOC/>
+        <SOURCES>
+          <root url="jar://C:/qub/qub/javacli-java/1/javacli-java.sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
