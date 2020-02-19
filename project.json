@@ -1,7 +1,7 @@
 {
   "publisher": "qub",
-  "project": "qub-java-publish",
-  "version": "47",
+  "project": "publish-java",
+  "version": "1",
   "java": {
     "mainClass": "qub.QubPublish",
     "shortcutName": "qub-publish",
@@ -9,8 +9,8 @@
     "dependencies": [
       {
         "publisher": "qub",
-        "project": "qub-java-pack",
-        "version": "50"
+        "project": "pack-java",
+        "version": "2"
       }
     ]
   }

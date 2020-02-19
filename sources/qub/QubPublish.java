@@ -4,10 +4,10 @@ public interface QubPublish
 {
     static void main(String[] args)
     {
-        Process.run(args, (Action1<Process>)QubPublish::main);
+        QubProcess.run(args, (Action1<QubProcess>)QubPublish::main);
     }
 
-    static CommandLineParameter<Folder> addFolderToPublishParameter(CommandLineParameters parameters, Process process)
+    static CommandLineParameter<Folder> addFolderToPublishParameter(CommandLineParameters parameters, QubProcess process)
     {
         PreCondition.assertNotNull(parameters, "parameters");
         PreCondition.assertNotNull(process, "process");
@@ -17,7 +17,7 @@ public interface QubPublish
             .setDescription("The folder to publish. Defaults to the current folder.");
     }
 
-    static QubPublishParameters getParameters(Process process)
+    static QubPublishParameters getParameters(QubProcess process)
     {
         PreCondition.assertNotNull(process, "process");
 
@@ -61,7 +61,7 @@ public interface QubPublish
         return result;
     }
 
-    static void main(Process process)
+    static void main(QubProcess process)
     {
         PreCondition.assertNotNull(process, "process");
 

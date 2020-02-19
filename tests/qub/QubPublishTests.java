@@ -15,19 +15,19 @@ public interface QubPublishTests
                 });
             });
 
-            runner.testGroup("main(Process)", () ->
+            runner.testGroup("main(QubProcess)", () ->
             {
                 runner.test("with null", (Test test) ->
                 {
                     test.assertThrows(new PreConditionFailure("process cannot be null."),
-                        () -> QubPublish.main((Process)null));
+                        () -> QubPublish.main((QubProcess)null));
                 });
 
                 runner.test("with \"-?\"", (Test test) ->
                 {
                     final InMemoryByteStream output = new InMemoryByteStream();
                     final InMemoryByteStream error = new InMemoryByteStream();
-                    try (final Process process = Process.create("-?"))
+                    try (final QubProcess process = QubProcess.create("-?"))
                     {
                         process.setOutputByteWriteStream(output);
                         process.setErrorByteWriteStream(error);
@@ -66,7 +66,7 @@ public interface QubPublishTests
                     projectJSON.setVersion("1");
                     projectJSON.setJava(new ProjectJSONJava());
                     fileSystem.setFileContentAsString("/project.json", projectJSON.toString()).await();
-                    try (final Process process = Process.create())
+                    try (final QubProcess process = QubProcess.create())
                     {
                         process.setOutputByteWriteStream(output);
                         process.setErrorByteWriteStream(error);
@@ -101,7 +101,7 @@ public interface QubPublishTests
                     fileSystem.setFileContentAsString(
                         "/project.json",
                         projectJSON.toString()).await();
-                    try (final Process process = Process.create())
+                    try (final QubProcess process = QubProcess.create())
                     {
                         process.setOutputByteWriteStream(output);
                         process.setErrorByteWriteStream(error);
@@ -164,7 +164,7 @@ public interface QubPublishTests
                     fileSystem.setFileContentAsString(
                         "/project.json",
                         projectJSON.toString()).await();
-                    try (final Process process = Process.create())
+                    try (final QubProcess process = QubProcess.create())
                     {
                         process.setOutputByteWriteStream(output);
                         process.setErrorByteWriteStream(error);
@@ -245,7 +245,7 @@ public interface QubPublishTests
                     fileSystem.setFileContentAsString(
                         "/project.json",
                         projectJSON.toString()).await();
-                    try (final Process process = Process.create())
+                    try (final QubProcess process = QubProcess.create())
                     {
                         process.setOutputByteWriteStream(output);
                         process.setErrorByteWriteStream(error);
@@ -342,7 +342,7 @@ public interface QubPublishTests
                     fileSystem.setFileContentAsString(
                         "/project.json",
                         projectJSON.toString()).await();
-                    try (final Process process = Process.create())
+                    try (final QubProcess process = QubProcess.create())
                     {
                         process.setOutputByteWriteStream(output);
                         process.setErrorByteWriteStream(error);
@@ -453,7 +453,7 @@ public interface QubPublishTests
                         projectJSON.toString()).await();
                     fileSystem.setFileContentAsString("/qub/me/my-other-project/5/my-other-project.jar", "hello").await();
                     fileSystem.setFileContentAsString("/qub/you/stuff/7.3.1/stuff.jar", "hello2").await();
-                    try (final Process process = Process.create())
+                    try (final QubProcess process = QubProcess.create())
                     {
                         process.setOutputByteWriteStream(output);
                         process.setErrorByteWriteStream(error);
@@ -580,7 +580,7 @@ public interface QubPublishTests
                     fileSystem.setFileContentAsString("/qub/me/b/5/project.json", bProjectJSON.toString()).await();
                     fileSystem.setFileContentAsString("/qub/me/c/7/c.jar", "hello").await();
                     fileSystem.setFileContentAsString("/qub/me/c/7/project.json", cProjectJSON.toString()).await();
-                    try (final Process process = Process.create())
+                    try (final QubProcess process = QubProcess.create())
                     {
                         process.setOutputByteWriteStream(output);
                         process.setErrorByteWriteStream(error);
@@ -689,7 +689,7 @@ public interface QubPublishTests
                     fileSystem.setFileContentAsString(
                         "/project.json",
                         projectJSON.toString()).await();
-                    try (final Process process = Process.create())
+                    try (final QubProcess process = QubProcess.create())
                     {
                         process.setOutputByteWriteStream(output);
                         process.setErrorByteWriteStream(error);
@@ -812,7 +812,7 @@ public interface QubPublishTests
                             .setVersion("2")
                             .setJava(new ProjectJSONJava())
                             .toString()).await();
-                    try (final Process process = Process.create())
+                    try (final QubProcess process = QubProcess.create())
                     {
                         process.setOutputByteWriteStream(output);
                         process.setErrorByteWriteStream(error);
