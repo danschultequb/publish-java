@@ -412,9 +412,22 @@ public interface QubPublishTests
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/1/my-project.jar").await()));
                     test.assertEqual(
                         Iterable.create(
+                            "Manifest File:",
+                            "/outputs/META-INF/MANIFEST.MF",
+                            "",
+                            "Content Files:",
+                            "MyProject.class"),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/versions/1/my-project.jar").await()));
+                    test.assertEqual(
+                        Iterable.create(
                             "Content Files:",
                             "MyProject.java"),
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/1/my-project.sources.jar").await()));
+                    test.assertEqual(
+                        Iterable.create(
+                            "Content Files:",
+                            "MyProject.java"),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/versions/1/my-project.sources.jar").await()));
                     test.assertEqual(
                         new ProjectJSON()
                             .setPublisher("me")
@@ -425,9 +438,18 @@ public interface QubPublishTests
                             .toString(),
                         fileSystem.getFileContentAsString("/qub/me/my-project/1/project.json").await());
                     test.assertEqual(
+                        new ProjectJSON()
+                            .setPublisher("me")
+                            .setProject("my-project")
+                            .setVersion("1")
+                            .setJava(new ProjectJSONJava()
+                                .setMainClass("MyProject"))
+                            .toString(),
+                        fileSystem.getFileContentAsString("/qub/me/my-project/versions/1/project.json").await());
+                    test.assertEqual(
                         Iterable.create(
                             "@echo OFF",
-                            "java -classpath %~dp0me/my-project/1/my-project.jar MyProject %*"),
+                            "java -classpath %~dp0me/my-project/versions/1/my-project.jar MyProject %*"),
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/my-project.cmd").await()));
                 });
 
@@ -526,9 +548,22 @@ public interface QubPublishTests
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/1/my-project.jar").await()));
                     test.assertEqual(
                         Iterable.create(
+                            "Manifest File:",
+                            "/outputs/META-INF/MANIFEST.MF",
+                            "",
+                            "Content Files:",
+                            "MyProject.class"),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/versions/1/my-project.jar").await()));
+                    test.assertEqual(
+                        Iterable.create(
                             "Content Files:",
                             "MyProject.java"),
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/1/my-project.sources.jar").await()));
+                    test.assertEqual(
+                        Iterable.create(
+                            "Content Files:",
+                            "MyProject.java"),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/versions/1/my-project.sources.jar").await()));
                     test.assertEqual(
                         new ProjectJSON()
                             .setPublisher("me")
@@ -542,9 +577,21 @@ public interface QubPublishTests
                             .toString(),
                         fileSystem.getFileContentAsString("/qub/me/my-project/1/project.json").await());
                     test.assertEqual(
+                        new ProjectJSON()
+                            .setPublisher("me")
+                            .setProject("my-project")
+                            .setVersion("1")
+                            .setJava(new ProjectJSONJava()
+                                .setMainClass("MyProject")
+                                .setDependencies(Iterable.create(
+                                    new ProjectSignature("me", "my-other-project", "5"),
+                                    new ProjectSignature("you", "stuff", "7.3.1"))))
+                            .toString(),
+                        fileSystem.getFileContentAsString("/qub/me/my-project/versions/1/project.json").await());
+                    test.assertEqual(
                         Iterable.create(
                             "@echo OFF",
-                            "java -classpath %~dp0me/my-project/1/my-project.jar;%~dp0you/stuff/7.3.1/stuff.jar;%~dp0me/my-other-project/5/my-other-project.jar MyProject %*"),
+                            "java -classpath %~dp0me/my-project/versions/1/my-project.jar;%~dp0you/stuff/7.3.1/stuff.jar;%~dp0me/my-other-project/5/my-other-project.jar MyProject %*"),
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/my-project.cmd").await()));
                 });
 
@@ -650,9 +697,22 @@ public interface QubPublishTests
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/me/a/1/a.jar").await()));
                     test.assertEqual(
                         Iterable.create(
+                            "Manifest File:",
+                            "/outputs/META-INF/MANIFEST.MF",
+                            "",
+                            "Content Files:",
+                            "MyProject.class"),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/a/versions/1/a.jar").await()));
+                    test.assertEqual(
+                        Iterable.create(
                             "Content Files:",
                             "MyProject.java"),
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/me/a/1/a.sources.jar").await()));
+                    test.assertEqual(
+                        Iterable.create(
+                            "Content Files:",
+                            "MyProject.java"),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/a/versions/1/a.sources.jar").await()));
                     test.assertEqual(
                         new ProjectJSON()
                             .setPublisher("me")
@@ -665,9 +725,167 @@ public interface QubPublishTests
                             .toString(),
                         fileSystem.getFileContentAsString("/qub/me/a/1/project.json").await());
                     test.assertEqual(
+                        new ProjectJSON()
+                            .setPublisher("me")
+                            .setProject("a")
+                            .setVersion("1")
+                            .setJava(new ProjectJSONJava()
+                                .setMainClass("MyProject")
+                                .setDependencies(Iterable.create(
+                                    new ProjectSignature("me", "b", "5"))))
+                            .toString(),
+                        fileSystem.getFileContentAsString("/qub/me/a/versions/1/project.json").await());
+                    test.assertEqual(
                         Iterable.create(
                             "@echo OFF",
-                            "java -classpath %~dp0me/a/1/a.jar;%~dp0me/b/5/b.jar;%~dp0me/c/7/c.jar MyProject %*"),
+                            "java -classpath %~dp0me/a/versions/1/a.jar;%~dp0me/b/5/b.jar;%~dp0me/c/7/c.jar MyProject %*"),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/a.cmd").await()));
+                });
+
+                runner.test("with mainClass and transitive dependencies under versions folder in project.json", (Test test) ->
+                {
+                    final InMemoryByteStream output = new InMemoryByteStream();
+                    final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
+                    fileSystem.createRoot("/").await();
+                    fileSystem.createFolder("/qub/").await();
+                    fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
+                    final ProjectJSON aProjectJSON = new ProjectJSON()
+                        .setProject("a")
+                        .setPublisher("me")
+                        .setVersion("1")
+                        .setJava(new ProjectJSONJava()
+                            .setMainClass("MyProject")
+                            .setDependencies(Iterable.create(
+                                new ProjectSignature("me", "b", "5"))));
+                    final ProjectJSON bProjectJSON = new ProjectJSON()
+                        .setProject("b")
+                        .setPublisher("me")
+                        .setVersion("5")
+                        .setJava(new ProjectJSONJava()
+                            .setDependencies(Iterable.create(
+                                new ProjectSignature("me", "c", "7"))));
+                    final ProjectJSON cProjectJSON = new ProjectJSON()
+                        .setProject("c")
+                        .setPublisher("me")
+                        .setVersion("7");
+                    fileSystem.setFileContentAsString("/project.json", aProjectJSON.toString()).await();
+                    fileSystem.setFileContentAsString("/qub/me/b/5/b.jar", "hello").await();
+                    fileSystem.setFileContentAsString("/qub/me/b/5/project.json", bProjectJSON.toString()).await();
+                    fileSystem.setFileContentAsString("/qub/me/c/versions/7/c.jar", "hello").await();
+                    fileSystem.setFileContentAsString("/qub/me/c/versions/7/project.json", cProjectJSON.toString()).await();
+                    try (final QubProcess process = QubProcess.create())
+                    {
+                        process.setOutputByteWriteStream(output);
+                        process.setErrorByteWriteStream(error);
+                        process.setFileSystem(fileSystem);
+                        process.setCurrentFolderPath(Path.parse("/"));
+                        process.setEnvironmentVariables(new EnvironmentVariables()
+                            .set("QUB_HOME", "/qub/"));
+
+                        final Folder currentFolder = process.getCurrentFolder().await();
+                        process.setJVMClasspath("/outputs");
+                        process.setProcessFactory(new FakeProcessFactory(process.getParallelAsyncRunner(), currentFolder)
+                            .add(new FakeJavacProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addOutputFolder(currentFolder.getFolder("outputs").await())
+                                .addXlintUnchecked()
+                                .addXlintDeprecation()
+                                .addClasspath(Iterable.create("/outputs", "/qub/me/b/5/b.jar", "/qub/me/c/versions/7/c.jar"))
+                                .addSourceFile("sources/MyProject.java")
+                                .setFunctionAutomatically())
+                            .add(new FakeConsoleTestRunnerProcessRun()
+                                .setWorkingFolder(currentFolder)
+                                .addClasspath("/outputs;/qub/me/b/5/b.jar;/qub/me/c/versions/7/c.jar")
+                                .addConsoleTestRunnerFullClassName()
+                                .addProfiler(false)
+                                .addVerbose(false)
+                                .addTestJson(true)
+                                .addOutputFolder("/outputs")
+                                .addCoverage(Coverage.None)
+                                .addFullClassNamesToTest(Iterable.create("MyProject")))
+                            .add(new FakeJarProcessRun()
+                                .setWorkingFolder(currentFolder.getFolder("sources").await())
+                                .addCreate()
+                                .addJarFile("a.sources.jar")
+                                .addContentFilePath("MyProject.java")
+                                .setFunctionAutomatically())
+                            .add(new FakeJarProcessRun()
+                                .setWorkingFolder(currentFolder.getFolder("outputs").await())
+                                .addCreate()
+                                .addJarFile("a.jar")
+                                .addManifestFile("/outputs/META-INF/MANIFEST.MF")
+                                .addContentFilePath("MyProject.class")
+                                .setFunctionAutomatically()));
+
+                        QubPublish.main(process);
+
+                        test.assertEqual(
+                            Iterable.create(
+                                "Compiling 1 file...",
+                                "Running tests...",
+                                "",
+                                "Creating sources jar file...",
+                                "Creating compiled sources jar file...",
+                                "Publishing me/a@1..."
+                            ),
+                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
+                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+
+                        test.assertEqual(0, process.getExitCode());
+                    }
+                    test.assertEqual(
+                        Iterable.create(
+                            "Manifest File:",
+                            "/outputs/META-INF/MANIFEST.MF",
+                            "",
+                            "Content Files:",
+                            "MyProject.class"),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/a/1/a.jar").await()));
+                    test.assertEqual(
+                        Iterable.create(
+                            "Manifest File:",
+                            "/outputs/META-INF/MANIFEST.MF",
+                            "",
+                            "Content Files:",
+                            "MyProject.class"),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/a/versions/1/a.jar").await()));
+                    test.assertEqual(
+                        Iterable.create(
+                            "Content Files:",
+                            "MyProject.java"),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/a/1/a.sources.jar").await()));
+                    test.assertEqual(
+                        Iterable.create(
+                            "Content Files:",
+                            "MyProject.java"),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/a/versions/1/a.sources.jar").await()));
+                    test.assertEqual(
+                        new ProjectJSON()
+                            .setPublisher("me")
+                            .setProject("a")
+                            .setVersion("1")
+                            .setJava(new ProjectJSONJava()
+                                .setMainClass("MyProject")
+                                .setDependencies(Iterable.create(
+                                    new ProjectSignature("me", "b", "5"))))
+                            .toString(),
+                        fileSystem.getFileContentAsString("/qub/me/a/1/project.json").await());
+                    test.assertEqual(
+                        new ProjectJSON()
+                            .setPublisher("me")
+                            .setProject("a")
+                            .setVersion("1")
+                            .setJava(new ProjectJSONJava()
+                                .setMainClass("MyProject")
+                                .setDependencies(Iterable.create(
+                                    new ProjectSignature("me", "b", "5"))))
+                            .toString(),
+                        fileSystem.getFileContentAsString("/qub/me/a/versions/1/project.json").await());
+                    test.assertEqual(
+                        Iterable.create(
+                            "@echo OFF",
+                            "java -classpath %~dp0me/a/versions/1/a.jar;%~dp0me/b/5/b.jar;%~dp0me/c/versions/7/c.jar MyProject %*"),
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/a.cmd").await()));
                 });
 
@@ -759,9 +977,22 @@ public interface QubPublishTests
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/1/my-project.jar").await()));
                     test.assertEqual(
                         Iterable.create(
+                            "Manifest File:",
+                            "/outputs/META-INF/MANIFEST.MF",
+                            "",
+                            "Content Files:",
+                            "MyProject.class"),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/versions/1/my-project.jar").await()));
+                    test.assertEqual(
+                        Iterable.create(
                             "Content Files:",
                             "MyProject.java"),
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/1/my-project.sources.jar").await()));
+                    test.assertEqual(
+                        Iterable.create(
+                            "Content Files:",
+                            "MyProject.java"),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/versions/1/my-project.sources.jar").await()));
                     test.assertEqual(
                         new ProjectJSON()
                             .setPublisher("me")
@@ -772,11 +1003,21 @@ public interface QubPublishTests
                                 .setShortcutName("foo"))
                             .toString(),
                         fileSystem.getFileContentAsString("/qub/me/my-project/1/project.json").await());
+                    test.assertEqual(
+                        new ProjectJSON()
+                            .setPublisher("me")
+                            .setProject("my-project")
+                            .setVersion("1")
+                            .setJava(new ProjectJSONJava()
+                                .setMainClass("MyProject")
+                                .setShortcutName("foo"))
+                            .toString(),
+                        fileSystem.getFileContentAsString("/qub/me/my-project/versions/1/project.json").await());
                     test.assertFalse(fileSystem.fileExists("/qub/my-project.cmd").await());
                     test.assertEqual(
                         Iterable.create(
                             "@echo OFF",
-                            "java -classpath %~dp0me/my-project/1/my-project.jar MyProject %*"),
+                            "java -classpath %~dp0me/my-project/versions/1/my-project.jar MyProject %*"),
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/foo.cmd").await()));
                 });
 
@@ -881,8 +1122,18 @@ public interface QubPublishTests
                     test.assertEqual(
                         Iterable.create(
                             "Content Files:",
+                            "MyProject.class"),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/versions/2/my-project.jar").await()));
+                    test.assertEqual(
+                        Iterable.create(
+                            "Content Files:",
                             "MyProject.java"),
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/2/my-project.sources.jar").await()));
+                    test.assertEqual(
+                        Iterable.create(
+                            "Content Files:",
+                            "MyProject.java"),
+                        Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/versions/2/my-project.sources.jar").await()));
                     test.assertEqual(
                         new ProjectJSON()
                             .setPublisher("me")
@@ -891,6 +1142,14 @@ public interface QubPublishTests
                             .setJava(new ProjectJSONJava())
                         .toString(),
                         fileSystem.getFileContentAsString("/qub/me/my-project/2/project.json").await());
+                    test.assertEqual(
+                        new ProjectJSON()
+                            .setPublisher("me")
+                            .setProject("my-project")
+                            .setVersion("2")
+                            .setJava(new ProjectJSONJava())
+                        .toString(),
+                        fileSystem.getFileContentAsString("/qub/me/my-project/versions/2/project.json").await());
                     test.assertFalse(fileSystem.fileExists("/qub/my-project.cmd").await());
                 });
             });
