@@ -1,7 +1,7 @@
 {
   "publisher": "qub",
   "project": "publish-java",
-  "version": "3",
+  "version": "5",
   "java": {
     "mainClass": "qub.QubPublish",
     "shortcutName": "qub-publish",
@@ -10,7 +10,7 @@
       {
         "publisher": "qub",
         "project": "pack-java",
-        "version": "4"
+        "version": "6"
       }
     ]
   }

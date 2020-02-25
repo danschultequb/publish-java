@@ -101,14 +101,13 @@ public interface QubPublish
                 final String project = projectJSON.getProject();
                 String version = projectJSON.getVersion();
                 final QubFolder qubFolder = QubFolder.get(folderToPublish.getFileSystem().getFolder(qubHome).await());
-
+                final QubProjectFolder projectFolder = qubFolder.getProjectFolder(publisher, project).await();
                 if (Strings.isNullOrEmpty(version))
                 {
-                    version = getLatestVersion(qubFolder, publisher, project)
-                        .catchError(NotFoundException.class)
-                        .await();
-                    if (!Strings.isNullOrEmpty(version))
+                    final QubProjectVersionFolder latestVersionFolder = projectFolder.getLatestProjectVersionFolder().catchError().await();
+                    if (latestVersionFolder != null)
                     {
+                        version = latestVersionFolder.getVersion();
                         final Integer intVersion = Integers.parse(version).catchError().await();
                         if (intVersion == null)
                         {
@@ -125,7 +124,7 @@ public interface QubPublish
                     }
                 }
 
-                final QubProjectVersionFolder versionFolder = qubFolder.getProjectVersionFolder(publisher, project, version).await();
+                final QubProjectVersionFolder versionFolder = projectFolder.getProjectVersionFolder(version).await();
                 if (versionFolder.exists().await())
                 {
                     throw new AlreadyExistsException("This package (" + publisher + "/" + project + ":" + version + ") can't be published because a package with that signature already exists.");
@@ -186,10 +185,9 @@ public interface QubPublish
                 for (final QubPublisherFolder publisherFolder : publisherFolders)
                 {
                     final Iterable<QubProjectFolder> projectFolders = publisherFolder.getProjectFolders().await();
-                    for (final QubProjectFolder projectFolder : projectFolders)
+                    for (final QubProjectFolder projectFolder2 : projectFolders)
                     {
-                        final Iterable<QubProjectVersionFolder> versionFolders = projectFolder.getProjectVersionFolders().await();
-                        final QubProjectVersionFolder latestVersionFolder = versionFolders.maximum(QubPublish::compareVersionFolders);
+                        final QubProjectVersionFolder latestVersionFolder = projectFolder2.getLatestProjectVersionFolder().catchError().await();
                         if (latestVersionFolder != null)
                         {
                             final File publishedProjectJsonFile = latestVersionFolder.getProjectJSONFile().await();
@@ -246,36 +244,5 @@ public interface QubPublish
         }
 
         return exitCode;
-    }
-
-    static Comparison compareVersionFolders(Folder lhs, Folder rhs)
-    {
-        final Integer lhsValue = Integers.parse(lhs.getName()).catchError().await();
-        final Integer rhsValue = Integers.parse(rhs.getName()).catchError().await();
-        return Comparer.compare(lhsValue, rhsValue);
-    }
-
-    static Result<QubProjectVersionFolder> getLatestVersionFolder(QubFolder qubFolder, String publisher, String project)
-    {
-        PreCondition.assertNotNull(qubFolder, "qubFolder");
-        PreCondition.assertNotNullAndNotEmpty(publisher, "publisher");
-        PreCondition.assertNotNullAndNotEmpty(project, "project");
-
-        return Result.create(() ->
-        {
-            Iterable<QubProjectVersionFolder> projectVersionFolders = qubFolder.getProjectVersionFolders(publisher, project).await();
-            QubProjectVersionFolder maximumVersionFolder = projectVersionFolders.maximum(QubPublish::compareVersionFolders);
-            if (maximumVersionFolder == null)
-            {
-                throw new NotFoundException("No project has been published for " + Strings.quote(publisher) + " with the name " + Strings.quote(project) + ".");
-            }
-            return maximumVersionFolder;
-        });
-    }
-
-    static Result<String> getLatestVersion(QubFolder qubFolder, String publisher, String project)
-    {
-        return getLatestVersionFolder(qubFolder, publisher, project)
-            .then(Folder::getName);
     }
 }
