@@ -60,11 +60,11 @@ public interface QubPublishTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
-                    final ProjectJSON projectJSON = new ProjectJSON();
+                    final ProjectJSON projectJSON = ProjectJSON.create();
                     projectJSON.setProject("my-project");
                     projectJSON.setPublisher("me");
                     projectJSON.setVersion("1");
-                    projectJSON.setJava(new ProjectJSONJava());
+                    projectJSON.setJava(ProjectJSONJava.create());
                     fileSystem.setFileContentAsString("/project.json", projectJSON.toString()).await();
                     try (final QubProcess process = QubProcess.create())
                     {
@@ -93,11 +93,11 @@ public interface QubPublishTests
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
-                    final ProjectJSON projectJSON = new ProjectJSON();
+                    final ProjectJSON projectJSON = ProjectJSON.create();
                     projectJSON.setProject("my-project");
                     projectJSON.setPublisher("me");
                     projectJSON.setVersion("1");
-                    projectJSON.setJava(new ProjectJSONJava());
+                    projectJSON.setJava(ProjectJSONJava.create());
                     fileSystem.setFileContentAsString(
                         "/project.json",
                         projectJSON.toString()).await();
@@ -156,11 +156,11 @@ public interface QubPublishTests
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/me/my-project/versions/1/").await();
                     fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
-                    final ProjectJSON projectJSON = new ProjectJSON();
+                    final ProjectJSON projectJSON = ProjectJSON.create();
                     projectJSON.setProject("my-project");
                     projectJSON.setPublisher("me");
                     projectJSON.setVersion("1");
-                    projectJSON.setJava(new ProjectJSONJava());
+                    projectJSON.setJava(ProjectJSONJava.create());
                     fileSystem.setFileContentAsString(
                         "/project.json",
                         projectJSON.toString()).await();
@@ -237,11 +237,11 @@ public interface QubPublishTests
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
                     fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
-                    final ProjectJSON projectJSON = new ProjectJSON();
+                    final ProjectJSON projectJSON = ProjectJSON.create();
                     projectJSON.setProject("my-project");
                     projectJSON.setPublisher("me");
                     projectJSON.setVersion("1");
-                    projectJSON.setJava(new ProjectJSONJava());
+                    projectJSON.setJava(ProjectJSONJava.create());
                     fileSystem.setFileContentAsString(
                         "/project.json",
                         projectJSON.toString()).await();
@@ -315,11 +315,11 @@ public interface QubPublishTests
                             "MyProject.java"),
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/versions/1/my-project.sources.jar").await()));
                     test.assertEqual(
-                        new ProjectJSON()
-                            .setPublisher("me")
+                        ProjectJSON.create()
                             .setProject("my-project")
+                            .setPublisher("me")
                             .setVersion("1")
-                            .setJava(new ProjectJSONJava())
+                            .setJava(ProjectJSONJava.create())
                             .toString(),
                         fileSystem.getFileContentAsString("/qub/me/my-project/versions/1/project.json").await());
                     test.assertFalse(fileSystem.fileExists("/qub/my-project.cmd").await());
@@ -333,11 +333,11 @@ public interface QubPublishTests
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
                     fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
-                    final ProjectJSON projectJSON = new ProjectJSON()
+                    final ProjectJSON projectJSON = ProjectJSON.create()
                         .setProject("my-project")
                         .setPublisher("me")
                         .setVersion("1")
-                        .setJava(new ProjectJSONJava()
+                        .setJava(ProjectJSONJava.create()
                             .setMainClass("MyProject"));
                     fileSystem.setFileContentAsString(
                         "/project.json",
@@ -416,11 +416,11 @@ public interface QubPublishTests
                             "MyProject.java"),
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/versions/1/my-project.sources.jar").await()));
                     test.assertEqual(
-                        new ProjectJSON()
-                            .setPublisher("me")
+                        ProjectJSON.create()
                             .setProject("my-project")
+                            .setPublisher("me")
                             .setVersion("1")
-                            .setJava(new ProjectJSONJava()
+                            .setJava(ProjectJSONJava.create()
                                 .setMainClass("MyProject"))
                             .toString(),
                         fileSystem.getFileContentAsString("/qub/me/my-project/versions/1/project.json").await());
@@ -439,11 +439,11 @@ public interface QubPublishTests
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
                     fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
-                    final ProjectJSON projectJSON = new ProjectJSON();
+                    final ProjectJSON projectJSON = ProjectJSON.create();
                     projectJSON.setProject("my-project");
                     projectJSON.setPublisher("me");
                     projectJSON.setVersion("1");
-                    projectJSON.setJava(new ProjectJSONJava()
+                    projectJSON.setJava(ProjectJSONJava.create()
                         .setMainClass("MyProject")
                         .setDependencies(Iterable.create(
                             new ProjectSignature("me", "my-other-project", "5"),
@@ -530,11 +530,11 @@ public interface QubPublishTests
                             "MyProject.java"),
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/versions/1/my-project.sources.jar").await()));
                     test.assertEqual(
-                        new ProjectJSON()
-                            .setPublisher("me")
+                        ProjectJSON.create()
                             .setProject("my-project")
+                            .setPublisher("me")
                             .setVersion("1")
-                            .setJava(new ProjectJSONJava()
+                            .setJava(ProjectJSONJava.create()
                                 .setMainClass("MyProject")
                                 .setDependencies(Iterable.create(
                                     new ProjectSignature("me", "my-other-project", "5"),
@@ -556,22 +556,22 @@ public interface QubPublishTests
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
                     fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
-                    final ProjectJSON aProjectJSON = new ProjectJSON()
+                    final ProjectJSON aProjectJSON = ProjectJSON.create()
                         .setProject("a")
                         .setPublisher("me")
                         .setVersion("1")
-                        .setJava(new ProjectJSONJava()
+                        .setJava(ProjectJSONJava.create()
                             .setMainClass("MyProject")
                             .setDependencies(Iterable.create(
                                 new ProjectSignature("me", "b", "5"))));
-                    final ProjectJSON bProjectJSON = new ProjectJSON()
+                    final ProjectJSON bProjectJSON = ProjectJSON.create()
                         .setProject("b")
                         .setPublisher("me")
                         .setVersion("5")
-                        .setJava(new ProjectJSONJava()
+                        .setJava(ProjectJSONJava.create()
                             .setDependencies(Iterable.create(
                                 new ProjectSignature("me", "c", "7"))));
-                    final ProjectJSON cProjectJSON = new ProjectJSON()
+                    final ProjectJSON cProjectJSON = ProjectJSON.create()
                         .setProject("c")
                         .setPublisher("me")
                         .setVersion("7");
@@ -654,11 +654,11 @@ public interface QubPublishTests
                             "MyProject.java"),
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/me/a/versions/1/a.sources.jar").await()));
                     test.assertEqual(
-                        new ProjectJSON()
-                            .setPublisher("me")
+                        ProjectJSON.create()
                             .setProject("a")
+                            .setPublisher("me")
                             .setVersion("1")
-                            .setJava(new ProjectJSONJava()
+                            .setJava(ProjectJSONJava.create()
                                 .setMainClass("MyProject")
                                 .setDependencies(Iterable.create(
                                     new ProjectSignature("me", "b", "5"))))
@@ -679,11 +679,11 @@ public interface QubPublishTests
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
                     fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
-                    final ProjectJSON projectJSON = new ProjectJSON();
+                    final ProjectJSON projectJSON = ProjectJSON.create();
                     projectJSON.setProject("my-project");
                     projectJSON.setPublisher("me");
                     projectJSON.setVersion("1");
-                    projectJSON.setJava(new ProjectJSONJava()
+                    projectJSON.setJava(ProjectJSONJava.create()
                         .setMainClass("MyProject")
                         .setShortcutName("foo"));
                     fileSystem.setFileContentAsString(
@@ -763,11 +763,11 @@ public interface QubPublishTests
                             "MyProject.java"),
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/versions/1/my-project.sources.jar").await()));
                     test.assertEqual(
-                        new ProjectJSON()
-                            .setPublisher("me")
+                        ProjectJSON.create()
                             .setProject("my-project")
+                            .setPublisher("me")
                             .setVersion("1")
-                            .setJava(new ProjectJSONJava()
+                            .setJava(ProjectJSONJava.create()
                                 .setMainClass("MyProject")
                                 .setShortcutName("foo"))
                             .toString(),
@@ -788,29 +788,29 @@ public interface QubPublishTests
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
                     fileSystem.setFileContentAsString("/qub/me/other-project/versions/10/project.json",
-                        new ProjectJSON()
+                        ProjectJSON.create()
                             .setPublisher("me")
                             .setProject("other-project")
                             .setVersion("10")
-                            .setJava(new ProjectJSONJava()
+                            .setJava(ProjectJSONJava.create()
                                 .setDependencies(Iterable.create(
                                     new ProjectSignature("me", "my-project", "1"))))
                             .toString()).await();
                     fileSystem.setFileContentAsString("/qub/me/my-other-project/versions/5/project.json",
-                        new ProjectJSON()
+                        ProjectJSON.create()
                             .setPublisher("me")
                             .setProject("my-other-project")
                             .setVersion("5")
-                            .setJava(new ProjectJSONJava()
+                            .setJava(ProjectJSONJava.create()
                                 .setDependencies(Iterable.create()))
                             .toString()).await();
                     fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
                     fileSystem.setFileContentAsString("/project.json",
-                        new ProjectJSON()
+                        ProjectJSON.create()
                             .setProject("my-project")
                             .setPublisher("me")
                             .setVersion("2")
-                            .setJava(new ProjectJSONJava())
+                            .setJava(ProjectJSONJava.create())
                             .toString()).await();
                     try (final QubProcess process = QubProcess.create())
                     {
@@ -884,11 +884,11 @@ public interface QubPublishTests
                             "MyProject.java"),
                         Strings.getLines(fileSystem.getFileContentAsString("/qub/me/my-project/versions/2/my-project.sources.jar").await()));
                     test.assertEqual(
-                        new ProjectJSON()
-                            .setPublisher("me")
+                        ProjectJSON.create()
                             .setProject("my-project")
+                            .setPublisher("me")
                             .setVersion("2")
-                            .setJava(new ProjectJSONJava())
+                            .setJava(ProjectJSONJava.create())
                         .toString(),
                         fileSystem.getFileContentAsString("/qub/me/my-project/versions/2/project.json").await());
                     test.assertFalse(fileSystem.fileExists("/qub/my-project.cmd").await());
