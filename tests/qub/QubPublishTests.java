@@ -25,12 +25,12 @@ public interface QubPublishTests
 
                 runner.test("with \"-?\"", (Test test) ->
                 {
-                    final InMemoryByteStream output = new InMemoryByteStream();
-                    final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
                     try (final QubProcess process = QubProcess.create("-?"))
                     {
-                        process.setOutputByteWriteStream(output);
-                        process.setErrorByteWriteStream(error);
+                        process.setOutputWriteStream(output);
+                        process.setErrorWriteStream(error);
 
                         QubPublish.main(process);
 
@@ -49,14 +49,14 @@ public interface QubPublishTests
                             "  --verbose(v): Whether or not to show verbose logs.",
                             "  --profiler: Whether or not this application should pause before it is run to allow a profiler to be attached.",
                             "  --help(?): Show the help message for this application."),
-                        Strings.getLines(output.asCharacterReadStream().getText().await()));
-                    test.assertEqual("", error.asCharacterReadStream().getText().await());
+                        Strings.getLines(output.getText().await()));
+                    test.assertEqual("", error.getText().await());
                 });
 
                 runner.test("with no QUB_HOME specified", (Test test) ->
                 {
-                    final InMemoryByteStream output = new InMemoryByteStream();
-                    final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
@@ -68,8 +68,8 @@ public interface QubPublishTests
                     fileSystem.setFileContentAsString("/project.json", projectJSON.toString()).await();
                     try (final QubProcess process = QubProcess.create())
                     {
-                        process.setOutputByteWriteStream(output);
-                        process.setErrorByteWriteStream(error);
+                        process.setOutputWriteStream(output);
+                        process.setErrorWriteStream(error);
                         process.setFileSystem(fileSystem);
                         process.setCurrentFolderPath(Path.parse("/"));
                         process.setEnvironmentVariables(new EnvironmentVariables());
@@ -82,14 +82,14 @@ public interface QubPublishTests
                         Iterable.create(
                             "ERROR: Can't publish without a QUB_HOME environment variable."
                         ),
-                        Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
-                    test.assertEqual("", error.asCharacterReadStream().getText().await());
+                        Strings.getLines(output.getText().await()).skipLast());
+                    test.assertEqual("", error.getText().await());
                 });
 
                 runner.test("with failed QubPack", (Test test) ->
                 {
-                    final InMemoryByteStream output = new InMemoryByteStream();
-                    final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
@@ -103,8 +103,8 @@ public interface QubPublishTests
                         projectJSON.toString()).await();
                     try (final QubProcess process = QubProcess.create())
                     {
-                        process.setOutputByteWriteStream(output);
-                        process.setErrorByteWriteStream(error);
+                        process.setOutputWriteStream(output);
+                        process.setErrorWriteStream(error);
                         process.setFileSystem(fileSystem);
                         process.setCurrentFolderPath(Path.parse("/"));
                         process.setEnvironmentVariables(new EnvironmentVariables()
@@ -141,8 +141,8 @@ public interface QubPublishTests
                                 "Running tests...",
                                 ""
                             ),
-                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
-                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+                            Strings.getLines(output.getText().await()).skipLast());
+                        test.assertEqual("", error.getText().await());
                     
                         test.assertEqual(1, process.getExitCode());
                     }
@@ -150,8 +150,8 @@ public interface QubPublishTests
 
                 runner.test("with already existing version folder", (Test test) ->
                 {
-                    final InMemoryByteStream output = new InMemoryByteStream();
-                    final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/me/my-project/versions/1/").await();
@@ -166,8 +166,8 @@ public interface QubPublishTests
                         projectJSON.toString()).await();
                     try (final QubProcess process = QubProcess.create())
                     {
-                        process.setOutputByteWriteStream(output);
-                        process.setErrorByteWriteStream(error);
+                        process.setOutputWriteStream(output);
+                        process.setErrorWriteStream(error);
                         process.setFileSystem(fileSystem);
                         process.setCurrentFolderPath(Path.parse("/"));
                         process.setEnvironmentVariables(new EnvironmentVariables()
@@ -218,8 +218,8 @@ public interface QubPublishTests
                                 "Creating compiled sources jar file...",
                                 "ERROR: This package (me/my-project:1) can't be published because a package with that signature already exists."
                             ),
-                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
-                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+                            Strings.getLines(output.getText().await()).skipLast());
+                        test.assertEqual("", error.getText().await());
 
                         test.assertEqual(1, process.getExitCode());
                     }
@@ -231,8 +231,8 @@ public interface QubPublishTests
 
                 runner.test("with simple success scenario", (Test test) ->
                 {
-                    final InMemoryByteStream output = new InMemoryByteStream();
-                    final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
@@ -247,8 +247,8 @@ public interface QubPublishTests
                         projectJSON.toString()).await();
                     try (final QubProcess process = QubProcess.create())
                     {
-                        process.setOutputByteWriteStream(output);
-                        process.setErrorByteWriteStream(error);
+                        process.setOutputWriteStream(output);
+                        process.setErrorWriteStream(error);
                         process.setFileSystem(fileSystem);
                         process.setCurrentFolderPath(Path.parse("/"));
                         process.setEnvironmentVariables(new EnvironmentVariables()
@@ -299,8 +299,8 @@ public interface QubPublishTests
                                 "Creating compiled sources jar file...",
                                 "Publishing me/my-project@1..."
                             ),
-                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
-                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+                            Strings.getLines(output.getText().await()).skipLast());
+                        test.assertEqual("", error.getText().await());
 
                         test.assertEqual(0, process.getExitCode());
                     }
@@ -327,8 +327,8 @@ public interface QubPublishTests
 
                 runner.test("with mainClass in project.json", (Test test) ->
                 {
-                    final InMemoryByteStream output = new InMemoryByteStream();
-                    final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
@@ -344,8 +344,8 @@ public interface QubPublishTests
                         projectJSON.toString()).await();
                     try (final QubProcess process = QubProcess.create())
                     {
-                        process.setOutputByteWriteStream(output);
-                        process.setErrorByteWriteStream(error);
+                        process.setOutputWriteStream(output);
+                        process.setErrorWriteStream(error);
                         process.setFileSystem(fileSystem);
                         process.setCurrentFolderPath(Path.parse("/"));
                         process.setEnvironmentVariables(new EnvironmentVariables()
@@ -397,8 +397,8 @@ public interface QubPublishTests
                                 "Creating compiled sources jar file...",
                                 "Publishing me/my-project@1..."
                             ),
-                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
-                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+                            Strings.getLines(output.getText().await()).skipLast());
+                        test.assertEqual("", error.getText().await());
 
                         test.assertEqual(0, process.getExitCode());
                     }
@@ -433,8 +433,8 @@ public interface QubPublishTests
 
                 runner.test("with mainClass and dependencies in project.json", (Test test) ->
                 {
-                    final InMemoryByteStream output = new InMemoryByteStream();
-                    final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
@@ -455,8 +455,8 @@ public interface QubPublishTests
                     fileSystem.setFileContentAsString("/qub/you/stuff/versions/7.3.1/stuff.jar", "hello2").await();
                     try (final QubProcess process = QubProcess.create())
                     {
-                        process.setOutputByteWriteStream(output);
-                        process.setErrorByteWriteStream(error);
+                        process.setOutputWriteStream(output);
+                        process.setErrorWriteStream(error);
                         process.setFileSystem(fileSystem);
                         process.setCurrentFolderPath(Path.parse("/"));
                         process.setEnvironmentVariables(new EnvironmentVariables()
@@ -511,8 +511,8 @@ public interface QubPublishTests
                                 "Creating compiled sources jar file...",
                                 "Publishing me/my-project@1..."
                             ),
-                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
-                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+                            Strings.getLines(output.getText().await()).skipLast());
+                        test.assertEqual("", error.getText().await());
 
                         test.assertEqual(0, process.getExitCode());
                     }
@@ -550,8 +550,8 @@ public interface QubPublishTests
 
                 runner.test("with mainClass and transitive dependencies in project.json", (Test test) ->
                 {
-                    final InMemoryByteStream output = new InMemoryByteStream();
-                    final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
@@ -582,8 +582,8 @@ public interface QubPublishTests
                     fileSystem.setFileContentAsString("/qub/me/c/versions/7/project.json", cProjectJSON.toString()).await();
                     try (final QubProcess process = QubProcess.create())
                     {
-                        process.setOutputByteWriteStream(output);
-                        process.setErrorByteWriteStream(error);
+                        process.setOutputWriteStream(output);
+                        process.setErrorWriteStream(error);
                         process.setFileSystem(fileSystem);
                         process.setCurrentFolderPath(Path.parse("/"));
                         process.setEnvironmentVariables(new EnvironmentVariables()
@@ -635,8 +635,8 @@ public interface QubPublishTests
                                 "Creating compiled sources jar file...",
                                 "Publishing me/a@1..."
                             ),
-                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
-                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+                            Strings.getLines(output.getText().await()).skipLast());
+                        test.assertEqual("", error.getText().await());
 
                         test.assertEqual(0, process.getExitCode());
                     }
@@ -673,8 +673,8 @@ public interface QubPublishTests
 
                 runner.test("with mainClass and shortcutName in project.json", (Test test) ->
                 {
-                    final InMemoryByteStream output = new InMemoryByteStream();
-                    final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
@@ -691,8 +691,8 @@ public interface QubPublishTests
                         projectJSON.toString()).await();
                     try (final QubProcess process = QubProcess.create())
                     {
-                        process.setOutputByteWriteStream(output);
-                        process.setErrorByteWriteStream(error);
+                        process.setOutputWriteStream(output);
+                        process.setErrorWriteStream(error);
                         process.setFileSystem(fileSystem);
                         process.setCurrentFolderPath(Path.parse("/"));
                         process.setEnvironmentVariables(new EnvironmentVariables()
@@ -744,8 +744,8 @@ public interface QubPublishTests
                                 "Creating compiled sources jar file...",
                                 "Publishing me/my-project@1..."
                             ),
-                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
-                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+                            Strings.getLines(output.getText().await()).skipLast());
+                        test.assertEqual("", error.getText().await());
 
                         test.assertEqual(0, process.getExitCode());
                     }
@@ -782,8 +782,8 @@ public interface QubPublishTests
 
                 runner.test("with dependent and non-dependent published project", (Test test) ->
                 {
-                    final InMemoryByteStream output = new InMemoryByteStream();
-                    final InMemoryByteStream error = new InMemoryByteStream();
+                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
@@ -814,8 +814,8 @@ public interface QubPublishTests
                             .toString()).await();
                     try (final QubProcess process = QubProcess.create())
                     {
-                        process.setOutputByteWriteStream(output);
-                        process.setErrorByteWriteStream(error);
+                        process.setOutputWriteStream(output);
+                        process.setErrorWriteStream(error);
                         process.setFileSystem(fileSystem);
                         process.setCurrentFolderPath(Path.parse("/"));
                         process.setEnvironmentVariables(new EnvironmentVariables()
@@ -868,8 +868,8 @@ public interface QubPublishTests
                                 "The following projects should be updated to use me/my-project@2:",
                                 "  me/other-project@10"
                             ),
-                            Strings.getLines(output.asCharacterReadStream().getText().await()).skipLast());
-                        test.assertEqual("", error.asCharacterReadStream().getText().await());
+                            Strings.getLines(output.getText().await()).skipLast());
+                        test.assertEqual("", error.getText().await());
 
                         test.assertEqual(0, process.getExitCode());
                     }

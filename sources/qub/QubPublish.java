@@ -40,8 +40,8 @@ public interface QubPublish
             profilerParameter.await();
             profilerParameter.removeValue().await();
 
-            final ByteWriteStream output = process.getOutputByteWriteStream();
-            final ByteWriteStream error = process.getErrorByteWriteStream();
+            final CharacterToByteWriteStream output = process.getOutputWriteStream();
+            final CharacterToByteWriteStream error = process.getErrorWriteStream();
             final Folder folderToPublish = folderToPublishParameter.removeValue().await();
             final EnvironmentVariables environmentVariables = process.getEnvironmentVariables();
             final ProcessFactory processFactory = process.getProcessFactory();
@@ -79,7 +79,7 @@ public interface QubPublish
     {
         PreCondition.assertNotNull(parameters, "parameters");
 
-        final CharacterWriteStream output = parameters.getOutputCharacterWriteStream();
+        final CharacterWriteStream output = parameters.getOutputWriteStream();
         final EnvironmentVariables environmentVariables = parameters.getEnvironmentVariables();
         final Folder folderToPublish = parameters.getFolderToPublish();
 
