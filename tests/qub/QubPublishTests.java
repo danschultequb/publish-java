@@ -25,8 +25,8 @@ public interface QubPublishTests
 
                 runner.test("with \"-?\"", (Test test) ->
                 {
-                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
-                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream output = InMemoryCharacterToByteStream.create();
+                    final InMemoryCharacterToByteStream error = InMemoryCharacterToByteStream.create();
                     try (final QubProcess process = QubProcess.create("-?"))
                     {
                         process.setOutputWriteStream(output);
@@ -55,8 +55,8 @@ public interface QubPublishTests
 
                 runner.test("with no QUB_HOME specified", (Test test) ->
                 {
-                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
-                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream output = InMemoryCharacterToByteStream.create();
+                    final InMemoryCharacterToByteStream error = InMemoryCharacterToByteStream.create();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
@@ -88,8 +88,8 @@ public interface QubPublishTests
 
                 runner.test("with failed QubPack", (Test test) ->
                 {
-                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
-                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream output = InMemoryCharacterToByteStream.create();
+                    final InMemoryCharacterToByteStream error = InMemoryCharacterToByteStream.create();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.setFileContentAsString("/sources/MyProject.java", "hello").await();
@@ -150,8 +150,8 @@ public interface QubPublishTests
 
                 runner.test("with already existing version folder", (Test test) ->
                 {
-                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
-                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream output = InMemoryCharacterToByteStream.create();
+                    final InMemoryCharacterToByteStream error = InMemoryCharacterToByteStream.create();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/me/my-project/versions/1/").await();
@@ -231,8 +231,8 @@ public interface QubPublishTests
 
                 runner.test("with simple success scenario", (Test test) ->
                 {
-                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
-                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream output = InMemoryCharacterToByteStream.create();
+                    final InMemoryCharacterToByteStream error = InMemoryCharacterToByteStream.create();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
@@ -327,8 +327,8 @@ public interface QubPublishTests
 
                 runner.test("with mainClass in project.json", (Test test) ->
                 {
-                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
-                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream output = InMemoryCharacterToByteStream.create();
+                    final InMemoryCharacterToByteStream error = InMemoryCharacterToByteStream.create();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
@@ -433,8 +433,8 @@ public interface QubPublishTests
 
                 runner.test("with mainClass and dependencies in project.json", (Test test) ->
                 {
-                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
-                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream output = InMemoryCharacterToByteStream.create();
+                    final InMemoryCharacterToByteStream error = InMemoryCharacterToByteStream.create();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
@@ -550,8 +550,8 @@ public interface QubPublishTests
 
                 runner.test("with mainClass and transitive dependencies in project.json", (Test test) ->
                 {
-                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
-                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream output = InMemoryCharacterToByteStream.create();
+                    final InMemoryCharacterToByteStream error = InMemoryCharacterToByteStream.create();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
@@ -673,8 +673,8 @@ public interface QubPublishTests
 
                 runner.test("with mainClass and shortcutName in project.json", (Test test) ->
                 {
-                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
-                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream output = InMemoryCharacterToByteStream.create();
+                    final InMemoryCharacterToByteStream error = InMemoryCharacterToByteStream.create();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
@@ -782,8 +782,8 @@ public interface QubPublishTests
 
                 runner.test("with dependent and non-dependent published project", (Test test) ->
                 {
-                    final InMemoryCharacterToByteStream output = new InMemoryCharacterToByteStream();
-                    final InMemoryCharacterToByteStream error = new InMemoryCharacterToByteStream();
+                    final InMemoryCharacterToByteStream output = InMemoryCharacterToByteStream.create();
+                    final InMemoryCharacterToByteStream error = InMemoryCharacterToByteStream.create();
                     final InMemoryFileSystem fileSystem = new InMemoryFileSystem(test.getClock());
                     fileSystem.createRoot("/").await();
                     fileSystem.createFolder("/qub/").await();
