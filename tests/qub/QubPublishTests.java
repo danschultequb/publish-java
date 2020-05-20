@@ -110,7 +110,7 @@ public interface QubPublishTests
                         process.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
 
-                        final Folder currentFolder = process.getCurrentFolder().await();
+                        final Folder currentFolder = process.getCurrentFolder();
                         process.setJVMClasspath(currentFolder.getFolder("outputs").await().toString());
                         process.setProcessFactory(new FakeProcessFactory(process.getParallelAsyncRunner(), currentFolder)
                             .add(new FakeJavacProcessRun()
@@ -173,7 +173,7 @@ public interface QubPublishTests
                         process.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
 
-                        final Folder currentFolder = process.getCurrentFolder().await();
+                        final Folder currentFolder = process.getCurrentFolder();
                         process.setJVMClasspath(currentFolder.getFolder("outputs").await().toString());
                         process.setProcessFactory(new FakeProcessFactory(process.getParallelAsyncRunner(), currentFolder)
                             .add(new FakeJavacProcessRun()
@@ -254,7 +254,7 @@ public interface QubPublishTests
                         process.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
 
-                        final Folder currentFolder = process.getCurrentFolder().await();
+                        final Folder currentFolder = process.getCurrentFolder();
                         process.setJVMClasspath(currentFolder.getFolder("outputs").await().toString());
                         process.setProcessFactory(new FakeProcessFactory(process.getParallelAsyncRunner(), currentFolder)
                             .add(new FakeJavacProcessRun()
@@ -351,7 +351,7 @@ public interface QubPublishTests
                         process.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
 
-                        final Folder currentFolder = process.getCurrentFolder().await();
+                        final Folder currentFolder = process.getCurrentFolder();
                         process.setJVMClasspath(currentFolder.getFolder("outputs").await().toString());
                         process.setProcessFactory(new FakeProcessFactory(process.getParallelAsyncRunner(), currentFolder)
                             .add(new FakeJavacProcessRun()
@@ -462,7 +462,7 @@ public interface QubPublishTests
                         process.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
 
-                        final Folder currentFolder = process.getCurrentFolder().await();
+                        final Folder currentFolder = process.getCurrentFolder();
                         process.setJVMClasspath(currentFolder.getFolder("outputs").await().toString());
                         process.setProcessFactory(new FakeProcessFactory(process.getParallelAsyncRunner(), currentFolder)
                             .add(new FakeJavacProcessRun()
@@ -589,7 +589,7 @@ public interface QubPublishTests
                         process.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
 
-                        final Folder currentFolder = process.getCurrentFolder().await();
+                        final Folder currentFolder = process.getCurrentFolder();
                         process.setJVMClasspath(currentFolder.getFolder("outputs").await().toString());
                         process.setProcessFactory(new FakeProcessFactory(process.getParallelAsyncRunner(), currentFolder)
                             .add(new FakeJavacProcessRun()
@@ -698,7 +698,7 @@ public interface QubPublishTests
                         process.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
 
-                        final Folder currentFolder = process.getCurrentFolder().await();
+                        final Folder currentFolder = process.getCurrentFolder();
                         process.setJVMClasspath(currentFolder.getFolder("outputs").await().toString());
                         process.setProcessFactory(new FakeProcessFactory(process.getParallelAsyncRunner(), currentFolder)
                             .add(new FakeJavacProcessRun()
@@ -821,7 +821,7 @@ public interface QubPublishTests
                         process.setEnvironmentVariables(new EnvironmentVariables()
                             .set("QUB_HOME", "/qub/"));
 
-                        final Folder currentFolder = process.getCurrentFolder().await();
+                        final Folder currentFolder = process.getCurrentFolder();
                         process.setJVMClasspath(currentFolder.getFolder("outputs").await().toString());
                         process.setProcessFactory(new FakeProcessFactory(process.getParallelAsyncRunner(), currentFolder)
                             .add(new FakeJavacProcessRun()
