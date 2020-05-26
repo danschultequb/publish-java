@@ -40,6 +40,7 @@ public interface QubPublish
             profilerParameter.await();
             profilerParameter.removeValue().await();
 
+            final CharacterToByteReadStream input = process.getInputReadStream();
             final CharacterToByteWriteStream output = process.getOutputWriteStream();
             final CharacterToByteWriteStream error = process.getErrorWriteStream();
             final Folder folderToPublish = folderToPublishParameter.removeValue().await();
@@ -48,7 +49,7 @@ public interface QubPublish
             final DefaultApplicationLauncher defaultApplicationLauncher = process.getDefaultApplicationLauncher();
             final String jvmClassPath = process.getJVMClasspath().await();
 
-            result = new QubPublishParameters(output, error, folderToPublish, environmentVariables, processFactory, defaultApplicationLauncher, jvmClassPath)
+            result = new QubPublishParameters(input, output, error, folderToPublish, environmentVariables, processFactory, defaultApplicationLauncher, jvmClassPath)
                 .setPackJson(packJsonParameter.removeValue().await())
                 .setTestJson(testJsonParameter.removeValue().await())
                 .setCoverage(coverageParameter.removeValue().await())

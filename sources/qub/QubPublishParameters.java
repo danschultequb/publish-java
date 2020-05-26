@@ -4,7 +4,7 @@ public class QubPublishParameters extends QubPackParameters
 {
     /**
      * Create a new QubPublishParameters object.
-     *
+     * @param inputReadStream The ByteReadStream that input should be read from.
      * @param outputWriteStream      The ByteWriteStream that output should be written to.
      * @param errorWriteStream       The ByteWriteStream that errors should be written to.
      * @param folderToPack               The folder that should have its tests run.
@@ -12,9 +12,9 @@ public class QubPublishParameters extends QubPackParameters
      * @param processFactory             The factory that will be used to create new processes.
      * @param defaultApplicationLauncher The object that will launch the default application for
      */
-    public QubPublishParameters(CharacterToByteWriteStream outputWriteStream, CharacterToByteWriteStream errorWriteStream, Folder folderToPack, EnvironmentVariables environmentVariables, ProcessFactory processFactory, DefaultApplicationLauncher defaultApplicationLauncher, String jvmClassPath)
+    public QubPublishParameters(CharacterToByteReadStream inputReadStream, CharacterToByteWriteStream outputWriteStream, CharacterToByteWriteStream errorWriteStream, Folder folderToPack, EnvironmentVariables environmentVariables, ProcessFactory processFactory, DefaultApplicationLauncher defaultApplicationLauncher, String jvmClassPath)
     {
-        super(outputWriteStream, errorWriteStream, folderToPack, environmentVariables, processFactory, defaultApplicationLauncher, jvmClassPath);
+        super(inputReadStream, outputWriteStream, errorWriteStream, folderToPack, environmentVariables, processFactory, defaultApplicationLauncher, jvmClassPath);
     }
 
     public Folder getFolderToPublish()

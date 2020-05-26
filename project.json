@@ -1,16 +1,15 @@
 {
   "publisher": "qub",
   "project": "publish-java",
-  "version": "17",
+  "version": "20",
   "java": {
     "mainClass": "qub.QubPublish",
     "shortcutName": "qub-publish",
-    "version": "1.8",
     "dependencies": [
       {
         "publisher": "qub",
         "project": "pack-java",
-        "version": "18"
+        "version": "21"
       }
     ]
   }
