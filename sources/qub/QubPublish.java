@@ -4,7 +4,7 @@ public interface QubPublish
 {
     static void main(String[] args)
     {
-        QubProcess.run(args, (Action1<QubProcess>)QubPublish::main);
+        QubProcess.run(args, QubPublish::getParameters, QubPublish::run);
     }
 
     static CommandLineParameter<Folder> addFolderToPublishParameter(CommandLineParameters parameters, QubProcess process)
@@ -28,8 +28,8 @@ public interface QubPublish
         final CommandLineParameterBoolean packJsonParameter = QubPack.addPackJsonParameter(parameters);
         final CommandLineParameterBoolean testJsonParameter = QubTest.addTestJsonParameter(parameters);
         final CommandLineParameter<Coverage> coverageParameter = QubTest.addCoverageParameter(parameters);
-        final CommandLineParameterBoolean buildJsonParameter = QubBuild.addBuildJsonParameter(parameters);
-        final CommandLineParameter<Warnings> warningsParameter = QubBuild.addWarningsParameter(parameters);
+        final CommandLineParameterBoolean buildJsonParameter = QubBuildCompile.addBuildJsonParameter(parameters);
+        final CommandLineParameter<Warnings> warningsParameter = QubBuildCompile.addWarningsParameter(parameters);
         final CommandLineParameterVerbose verboseParameter = parameters.addVerbose(process);
         final CommandLineParameterProfiler profilerParameter = parameters.addProfiler(process, QubPublish.class);
         final CommandLineParameterHelp helpParameter = parameters.addHelp();
@@ -62,20 +62,6 @@ public interface QubPublish
         return result;
     }
 
-    static void main(QubProcess process)
-    {
-        PreCondition.assertNotNull(process, "process");
-
-        final QubPublishParameters parameters = QubPublish.getParameters(process);
-        if (parameters != null)
-        {
-            process.showDuration(() ->
-            {
-                process.setExitCode(QubPublish.run(parameters));
-            });
-        }
-    }
-
     static int run(QubPublishParameters parameters)
     {
         PreCondition.assertNotNull(parameters, "parameters");
@@ -100,28 +86,23 @@ public interface QubPublish
                 final ProjectJSON projectJSON = ProjectJSON.parse(projectJsonFile).await();
                 final String publisher = projectJSON.getPublisher();
                 final String project = projectJSON.getProject();
-                String version = projectJSON.getVersion();
+                VersionNumber version = projectJSON.getVersion();
                 final QubFolder qubFolder = QubFolder.get(folderToPublish.getFileSystem().getFolder(qubHome).await());
                 final QubProjectFolder projectFolder = qubFolder.getProjectFolder(publisher, project).await();
-                if (Strings.isNullOrEmpty(version))
+                if (version == null || !version.any())
                 {
                     final QubProjectVersionFolder latestVersionFolder = projectFolder.getLatestProjectVersionFolder().catchError().await();
                     if (latestVersionFolder != null)
                     {
-                        version = latestVersionFolder.getVersion();
-                        final Integer intVersion = Integers.parse(version).catchError().await();
-                        if (intVersion == null)
+                        final VersionNumber latestVersion = latestVersionFolder.getVersion().catchError().await();
+                        if (latestVersion != null && latestVersion.hasMajor())
                         {
-                            version = null;
-                        }
-                        else
-                        {
-                            version = Integers.toString(intVersion + 1);
+                            version = VersionNumber.create().setMajor(latestVersion.getMajor() + 1);
                         }
                     }
-                    if (Strings.isNullOrEmpty(version))
+                    if (version == null || !version.any())
                     {
-                        version = "1";
+                        version = VersionNumber.create().setMajor(1);
                     }
                 }
 
@@ -208,7 +189,7 @@ public interface QubPublish
                                             Comparer.equal(d.getProject(), project));
                                         if (dependency != null)
                                         {
-                                            final ProjectSignature publishedProjectSignature = new ProjectSignature(
+                                            final ProjectSignature publishedProjectSignature = ProjectSignature.create(
                                                 publishedProjectJson.getPublisher(),
                                                 publishedProjectJson.getProject(),
                                                 publishedProjectJson.getVersion());
