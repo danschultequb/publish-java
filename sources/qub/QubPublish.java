@@ -26,8 +26,8 @@ public interface QubPublish
             .setApplicationDescription("Used to published packaged source and compiled code to the qub folder.");
         final CommandLineParameter<Folder> folderToPublishParameter = QubPublish.addFolderToPublishParameter(parameters, process);
         final CommandLineParameterBoolean packJsonParameter = QubPack.addPackJsonParameter(parameters);
-        final CommandLineParameterBoolean testJsonParameter = QubTest.addTestJsonParameter(parameters);
-        final CommandLineParameter<Coverage> coverageParameter = QubTest.addCoverageParameter(parameters);
+        final CommandLineParameterBoolean testJsonParameter = QubTestRun.addTestJsonParameter(parameters);
+        final CommandLineParameter<Coverage> coverageParameter = QubTestRun.addCoverageParameter(parameters);
         final CommandLineParameterBoolean buildJsonParameter = QubBuildCompile.addBuildJsonParameter(parameters);
         final CommandLineParameter<Warnings> warningsParameter = QubBuildCompile.addWarningsParameter(parameters);
         final CommandLineParameterVerbose verboseParameter = parameters.addVerbose(process);
@@ -154,7 +154,7 @@ public interface QubPublish
                         }
 
                         final File shortcutFile = qubFolder.getFile(shortcutName + ".cmd").await();
-                        try (final CharacterWriteStream shortcutFileStream = shortcutFile.getContentCharacterWriteStream().await())
+                        try (final CharacterWriteStream shortcutFileStream = shortcutFile.getContentsCharacterWriteStream().await())
                         {
                             shortcutFileStream.writeLine("@echo OFF").await();
                             shortcutFileStream.writeLine("java -classpath " + classpath + " " + mainClass + " %*").await();
