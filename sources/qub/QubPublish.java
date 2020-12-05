@@ -4,10 +4,10 @@ public interface QubPublish
 {
     static void main(String[] args)
     {
-        QubProcess.run(args, QubPublish::getParameters, QubPublish::run);
+        DesktopProcess.run(args, QubPublish::getParameters, QubPublish::run);
     }
 
-    static CommandLineParameter<Folder> addFolderToPublishParameter(CommandLineParameters parameters, QubProcess process)
+    static CommandLineParameter<Folder> addFolderToPublishParameter(CommandLineParameters parameters, DesktopProcess process)
     {
         PreCondition.assertNotNull(parameters, "parameters");
         PreCondition.assertNotNull(process, "process");
@@ -17,7 +17,7 @@ public interface QubPublish
             .setDescription("The folder to publish. Defaults to the current folder.");
     }
 
-    static QubPublishParameters getParameters(QubProcess process)
+    static QubPublishParameters getParameters(DesktopProcess process)
     {
         PreCondition.assertNotNull(process, "process");
 
@@ -48,14 +48,15 @@ public interface QubPublish
             final ProcessFactory processFactory = process.getProcessFactory();
             final DefaultApplicationLauncher defaultApplicationLauncher = process.getDefaultApplicationLauncher();
             final String jvmClassPath = process.getJVMClasspath().await();
+            final TypeLoader typeLoader = process.getTypeLoader();
 
-            result = new QubPublishParameters(input, output, error, folderToPublish, environmentVariables, processFactory, defaultApplicationLauncher, jvmClassPath)
+            result = new QubPublishParameters(input, output, error, folderToPublish, environmentVariables, processFactory, defaultApplicationLauncher, jvmClassPath, typeLoader)
                 .setPackJson(packJsonParameter.removeValue().await())
                 .setTestJson(testJsonParameter.removeValue().await())
                 .setCoverage(coverageParameter.removeValue().await())
                 .setBuildJson(buildJsonParameter.removeValue().await())
                 .setWarnings(warningsParameter.removeValue().await())
-                .setVerbose(verboseParameter.getVerboseCharacterWriteStream().await())
+                .setVerbose(verboseParameter.getVerboseCharacterToByteWriteStream().await())
                 .setProfiler(profilerParameter.removeValue().await());
         }
 
@@ -136,7 +137,8 @@ public interface QubPublish
                             shortcutName = projectJSON.getProject();
                         }
 
-                        String classpath = "%~dp0" + versionFolder.getCompiledSourcesFile().await().relativeTo(qubFolder);
+                        final CharacterList classpath = CharacterList.create()
+                            .addAll("%~dp0").addAll(versionFolder.getCompiledSourcesFile().await().relativeTo(qubFolder).toString());
                         Iterable<ProjectSignature> dependencies = projectJsonJava.getDependencies();
                         if (!Iterable.isNullOrEmpty(dependencies))
                         {
@@ -149,7 +151,7 @@ public interface QubPublish
                                     dependency.getProject(),
                                     dependency.getVersion()).await();
                                 final Path dependencyCompiledSourcesJarFileRelativePath = dependencyCompiledSourcesJarFile.relativeTo(qubFolder);
-                                classpath += ";%~dp0" + dependencyCompiledSourcesJarFileRelativePath;
+                                classpath.addAll(";%~dp0").addAll(dependencyCompiledSourcesJarFileRelativePath.toString());
                             }
                         }
 
