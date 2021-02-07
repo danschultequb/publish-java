@@ -123,7 +123,7 @@ public interface QubPublishTests
                     final File qubTestCompiledSourcesFile = qubTestProjectFolder.getCompiledSourcesFile("8").await();
                     qubTestCompiledSourcesFile.create().await();
                     final Folder currentFolder = fileSystem.getFolder("/current/folder/").await();
-                    final FakeDefaultApplicationLauncher defaultApplicationLauncher = FakeDefaultApplicationLauncher.create();
+                    final FakeDefaultApplicationLauncher defaultApplicationLauncher = FakeDefaultApplicationLauncher.create(fileSystem);
                     final FakeProcessFactory processFactory = FakeProcessFactory.create(test.getParallelAsyncRunner(), currentFolder);
                     final EnvironmentVariables environmentVariables = EnvironmentVariables.create();
                     final String jvmClassPath = "/fake-jvm-classpath";
@@ -167,7 +167,7 @@ public interface QubPublishTests
                     final Folder outputsFolder = currentFolder.getFolder("outputs").await();
                     final File aJavaFile = currentFolder.getFile("sources/A.java").await();
                     aJavaFile.setContentsAsString("A.java source").await();
-                    final FakeDefaultApplicationLauncher defaultApplicationLauncher = FakeDefaultApplicationLauncher.create();
+                    final FakeDefaultApplicationLauncher defaultApplicationLauncher = FakeDefaultApplicationLauncher.create(fileSystem);
                     final String jvmClassPath = "/fake-jvm-classpath";
                     final FakeProcessFactory processFactory = FakeProcessFactory.create(test.getParallelAsyncRunner(), currentFolder)
                         .add(new FakeJavacProcessRun()
@@ -244,7 +244,7 @@ public interface QubPublishTests
                     final Folder sourcesFolder = currentFolder.getFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source").await();
-                    final FakeDefaultApplicationLauncher defaultApplicationLauncher = FakeDefaultApplicationLauncher.create();
+                    final FakeDefaultApplicationLauncher defaultApplicationLauncher = FakeDefaultApplicationLauncher.create(fileSystem);
                     final String jvmClassPath = "/fake-jvm-classpath";
                     final FakeProcessFactory processFactory = FakeProcessFactory.create(test.getParallelAsyncRunner(), currentFolder)
                         .add(new FakeJavacProcessRun()
@@ -342,7 +342,7 @@ public interface QubPublishTests
                     final Folder sourcesFolder = currentFolder.getFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source").await();
-                    final FakeDefaultApplicationLauncher defaultApplicationLauncher = FakeDefaultApplicationLauncher.create();
+                    final FakeDefaultApplicationLauncher defaultApplicationLauncher = FakeDefaultApplicationLauncher.create(fileSystem);
                     final String jvmClassPath = "/fake-jvm-classpath";
                     final FakeProcessFactory processFactory = FakeProcessFactory.create(test.getParallelAsyncRunner(), currentFolder)
                         .add(new FakeJavacProcessRun()
@@ -456,7 +456,7 @@ public interface QubPublishTests
                     final Folder sourcesFolder = currentFolder.getFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source").await();
-                    final FakeDefaultApplicationLauncher defaultApplicationLauncher = FakeDefaultApplicationLauncher.create();
+                    final FakeDefaultApplicationLauncher defaultApplicationLauncher = FakeDefaultApplicationLauncher.create(fileSystem);
                     final String jvmClassPath = "/fake-jvm-classpath";
                     final FakeProcessFactory processFactory = FakeProcessFactory.create(test.getParallelAsyncRunner(), currentFolder)
                         .add(new FakeJavacProcessRun()
@@ -587,7 +587,7 @@ public interface QubPublishTests
                     final Folder sourcesFolder = currentFolder.getFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source").await();
-                    final FakeDefaultApplicationLauncher defaultApplicationLauncher = FakeDefaultApplicationLauncher.create();
+                    final FakeDefaultApplicationLauncher defaultApplicationLauncher = FakeDefaultApplicationLauncher.create(fileSystem);
                     final String jvmClassPath = "/fake-jvm-classpath";
                     final FakeProcessFactory processFactory = FakeProcessFactory.create(test.getParallelAsyncRunner(), currentFolder)
                         .add(new FakeJavacProcessRun()
@@ -746,7 +746,7 @@ public interface QubPublishTests
                     final Folder sourcesFolder = currentFolder.getFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source").await();
-                    final FakeDefaultApplicationLauncher defaultApplicationLauncher = FakeDefaultApplicationLauncher.create();
+                    final FakeDefaultApplicationLauncher defaultApplicationLauncher = FakeDefaultApplicationLauncher.create(fileSystem);
                     final String jvmClassPath = "/fake-jvm-classpath";
                     final FakeProcessFactory processFactory = FakeProcessFactory.create(test.getParallelAsyncRunner(), currentFolder)
                         .add(new FakeJavacProcessRun()
@@ -878,7 +878,7 @@ public interface QubPublishTests
                     final Folder sourcesFolder = currentFolder.getFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source").await();
-                    final FakeDefaultApplicationLauncher defaultApplicationLauncher = FakeDefaultApplicationLauncher.create();
+                    final FakeDefaultApplicationLauncher defaultApplicationLauncher = FakeDefaultApplicationLauncher.create(fileSystem);
                     final String jvmClassPath = "/fake-jvm-classpath";
                     final FakeProcessFactory processFactory = FakeProcessFactory.create(test.getParallelAsyncRunner(), currentFolder)
                         .add(new FakeJavacProcessRun()
@@ -1000,7 +1000,7 @@ public interface QubPublishTests
                     final Folder sourcesFolder = currentFolder.getFolder("sources").await();
                     final File aJavaFile = sourcesFolder.getFile("A.java").await();
                     aJavaFile.setContentsAsString("A.java source").await();
-                    final FakeDefaultApplicationLauncher defaultApplicationLauncher = FakeDefaultApplicationLauncher.create();
+                    final FakeDefaultApplicationLauncher defaultApplicationLauncher = FakeDefaultApplicationLauncher.create(fileSystem);
                     final String jvmClassPath = "/fake-jvm-classpath";
                     final FakeProcessFactory processFactory = FakeProcessFactory.create(test.getParallelAsyncRunner(), currentFolder)
                         .add(new FakeJavacProcessRun()
