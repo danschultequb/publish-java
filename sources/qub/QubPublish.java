@@ -48,8 +48,9 @@ public interface QubPublish
             final DefaultApplicationLauncher defaultApplicationLauncher = process.getDefaultApplicationLauncher();
             final String jvmClassPath = process.getJVMClasspath().await();
             final TypeLoader typeLoader = process.getTypeLoader();
+            final QubFolder qubFolder = process.getQubFolder().await();
 
-            result = new QubPublishParameters(output, error, folderToPublish, environmentVariables, processFactory, defaultApplicationLauncher, jvmClassPath, typeLoader)
+            result = new QubPublishParameters(output, error, folderToPublish, environmentVariables, processFactory, defaultApplicationLauncher, jvmClassPath, typeLoader, qubFolder)
                 .setPackJson(packJsonParameter.removeValue().await())
                 .setTestJson(testJsonParameter.removeValue().await())
                 .setCoverage(coverageParameter.removeValue().await())
@@ -67,16 +68,12 @@ public interface QubPublish
         PreCondition.assertNotNull(parameters, "parameters");
 
         final CharacterWriteStream output = parameters.getOutputWriteStream();
-        final EnvironmentVariables environmentVariables = parameters.getEnvironmentVariables();
         final Folder folderToPublish = parameters.getFolderToPublish();
+        final QubFolder qubFolder = parameters.getQubFolder();
 
         int exitCode = 0;
         try
         {
-            final String qubHome = environmentVariables.get("QUB_HOME")
-                .convertError(NotFoundException.class, () -> new NotFoundException("Can't publish without a QUB_HOME environment variable."))
-                .await();
-
             exitCode = QubPack.run(parameters);
             if (exitCode == 0)
             {
@@ -87,7 +84,6 @@ public interface QubPublish
                 final String publisher = projectJSON.getPublisher();
                 final String project = projectJSON.getProject();
                 VersionNumber version = projectJSON.getVersion();
-                final QubFolder qubFolder = QubFolder.get(folderToPublish.getFileSystem().getFolder(qubHome).await());
                 final QubProjectFolder projectFolder = qubFolder.getProjectFolder(publisher, project).await();
                 if (version == null || !version.any())
                 {

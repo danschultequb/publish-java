@@ -11,9 +11,9 @@ public class QubPublishParameters extends QubPackParameters
      * @param processFactory             The factory that will be used to create new processes.
      * @param defaultApplicationLauncher The object that will launch the default application for
      */
-    public QubPublishParameters(CharacterToByteWriteStream outputWriteStream, CharacterToByteWriteStream errorWriteStream, Folder folderToPack, EnvironmentVariables environmentVariables, ProcessFactory processFactory, DefaultApplicationLauncher defaultApplicationLauncher, String jvmClassPath, TypeLoader typeLoader)
+    public QubPublishParameters(CharacterToByteWriteStream outputWriteStream, CharacterToByteWriteStream errorWriteStream, Folder folderToPack, EnvironmentVariables environmentVariables, ProcessFactory processFactory, DefaultApplicationLauncher defaultApplicationLauncher, String jvmClassPath, TypeLoader typeLoader, QubFolder qubFolder)
     {
-        super(outputWriteStream, errorWriteStream, folderToPack, environmentVariables, processFactory, defaultApplicationLauncher, jvmClassPath, typeLoader);
+        super(outputWriteStream, errorWriteStream, folderToPack, environmentVariables, processFactory, defaultApplicationLauncher, jvmClassPath, typeLoader, qubFolder);
     }
 
     public Folder getFolderToPublish()
