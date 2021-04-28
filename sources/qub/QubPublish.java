@@ -160,11 +160,9 @@ public interface QubPublish
                 }
 
                 final List<String> projectsToUpdate = List.create();
-                final Iterable<QubPublisherFolder> publisherFolders = qubFolder.getPublisherFolders().await();
-                for (final QubPublisherFolder publisherFolder : publisherFolders)
+                for (final QubPublisherFolder publisherFolder : qubFolder.iteratePublisherFolders())
                 {
-                    final Iterable<QubProjectFolder> projectFolders = publisherFolder.getProjectFolders().await();
-                    for (final QubProjectFolder projectFolder2 : projectFolders)
+                    for (final QubProjectFolder projectFolder2 : publisherFolder.iterateProjectFolders())
                     {
                         final QubProjectVersionFolder latestVersionFolder = projectFolder2.getLatestProjectVersionFolder().catchError().await();
                         if (latestVersionFolder != null)
