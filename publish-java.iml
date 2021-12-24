@@ -13,22 +13,22 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/pack-java/versions/53/pack-java.jar!/"/>
+          <root url="jar://C:/qub/qub/pack-java/versions/54/pack-java.jar!/"/>
         </CLASSES>
         <JAVADOC/>
         <SOURCES>
-          <root url="jar://C:/qub/qub/pack-java/versions/53/pack-java.sources.jar!/"/>
+          <root url="jar://C:/qub/qub/pack-java/versions/54/pack-java.sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/qub/qub/test-java/versions/63/test-java.jar!/"/>
+          <root url="jar://C:/qub/qub/test-java/versions/65/test-java.jar!/"/>
         </CLASSES>
         <JAVADOC/>
         <SOURCES>
-          <root url="jar://C:/qub/qub/test-java/versions/63/test-java.sources.jar!/"/>
+          <root url="jar://C:/qub/qub/test-java/versions/65/test-java.sources.jar!/"/>
         </SOURCES>
       </library>
     </orderEntry>
